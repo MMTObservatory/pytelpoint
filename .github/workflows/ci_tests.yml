@@ -24,43 +24,18 @@ jobs:
         include:
           - name: Code style checks
             os: ubuntu-latest
-            python: 3.x
+            python: 3.9
             toxenv: codestyle
 
-          - name: Python 3.7 with minimal dependencies
+          - name: Python 3.9 with all optional dependencies and coverage checking
             os: ubuntu-latest
-            python: 3.7
-            toxenv: py37-test
+            python: 3.9
+            toxenv: py39-test-alldeps-cov
 
-          - name: Python 3.8 with all optional dependencies and coverage checking
-            os: ubuntu-latest
-            python: 3.8
-            toxenv: py38-test-alldeps-cov
-
-          - name: OS X - Python 3.8 with all optional dependencies
+          - name: OS X - Python 3.9 with all optional dependencies
             os: macos-latest
-            python: 3.8
-            toxenv: py38-test-alldeps
-
-          - name: Windows - Python 3.8 with all optional dependencies
-            os: windows-latest
-            python: 3.8
-            toxenv: py38-test-alldeps
-
-          # - name: Python 3.7 with oldest supported version of all dependencies
-          #   os: ubuntu-16.04
-          #   python: 3.7
-          #   toxenv: py37-test-oldestdeps
-
-          # - name: Python 3.8 with latest dev versions of key dependencies
-          #   os: ubuntu-latest
-          #   python: 3.8
-          #   toxenv: py38-test-devdeps
-
-          # - name: Test building of Sphinx docs
-          #   os: ubuntu-latest
-          #   python: 3.x
-          #   toxenv: build_docs
+            python: 3.9
+            toxenv: py39-test-alldeps
 
     steps:
     - name: Checkout code
@@ -78,7 +53,6 @@ jobs:
     - name: Test with tox
       run: |
         tox -e ${{ matrix.toxenv }}
-    # This is an example of how to upload coverage to codecov
     # - name: Upload coverage to codecov
     #   if: "contains(matrix.toxenv, '-cov')"
     #   uses: codecov/codecov-action@v1
