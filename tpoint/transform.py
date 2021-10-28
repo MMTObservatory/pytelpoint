@@ -3,16 +3,11 @@
 import numpy as np
 
 import astropy.units as u
-from astropy.coordinates import EarthLocation, AltAz, SkyCoord
-from astropy.time import Time
+from astropy.coordinates import SkyCoord
 
-
-MMT_LOCATION = EarthLocation.from_geodetic("-110:53:04.4", "31:41:19.6", 2600 * u.m)
-#obstime = Time("2021-08-21T06:00:00", format='isot')
 
 def tpoint(
         coo,
-        obstime=Time.now(),
         ia=0.,
         ie=0.,
         an=0.,
@@ -20,8 +15,7 @@ def tpoint(
         ca=0.,
         npae=0.,
         tf=0.,
-        tx=0.
-    ):
+        tx=0.):
     """
     Apply 8-term alt-az TPOINT model to set of raw alt-az coordinates and return corrected coordinates.
     Parameter names match those used by TPOINT: IA, IE, AN, AW, CA, NPAE, TF, and TX. See TPOINT documentation
@@ -30,9 +24,7 @@ def tpoint(
     Parameters
     ----------
     coo : `~astropy.coordinates.SkyCoord` instance
-        Raw Az-El coordinates to correct via TPOINT model
-    obstime : `~astropy.time.Time` instance (default: `~astropy.time.Time.now()`)
-        Observation time of the raw coordinates
+        Raw Az-El coordinates to correct via TPOINT model. Must be in an AltAz frame.
     ia : float (default: 0)
         Azimuth index value (i.e. zeropoint)
     ie : float (default: 0)
@@ -53,8 +45,8 @@ def tpoint(
     tx : float (default: 0)
         Tube flexure term proportional to cot(el).
     """
-    # don't strictly need time or location for our purposes, but astropy wants them for defining the alt/az frame
-    aa_frame = AltAz(obstime=obstime, location=MMT_LOCATION)
+    if coo.frame.name != 'altaz':
+        raise ValueError("TPOINT model can only be applied to AltAz coordinates.")
 
     da = -1 * ia
     da -= an * np.sin(coo.az) * np.tan(coo.alt)
@@ -71,5 +63,5 @@ def tpoint(
     new_az = coo.az + da * u.arcsec
     new_alt = coo.alt + de * u.arcsec
 
-    new_coo = SkyCoord(new_az, new_alt, frame=aa_frame)
+    new_coo = SkyCoord(new_az, new_alt, frame=coo.frame)
     return new_coo
