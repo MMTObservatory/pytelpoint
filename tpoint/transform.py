@@ -44,6 +44,11 @@ def tpoint(
         Tube flexure term proportional to cos(el).
     tx : float (default: 0)
         Tube flexure term proportional to cot(el).
+
+    Returns
+    -------
+    new_coo : `~astropy.coordinates.SkyCoord` instance
+        New coordinates with tpoint model applied.
     """
     if coo.frame.name != 'altaz':
         raise ValueError("TPOINT model can only be applied to AltAz coordinates.")
