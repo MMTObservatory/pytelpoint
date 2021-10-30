@@ -1,8 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-import astropy
-import numpy as np
-
 from astropy.tests.helper import assert_quantity_allclose as assert_allclose
 import astropy.units as u
 from astropy.coordinates import Angle, AltAz, SkyCoord
