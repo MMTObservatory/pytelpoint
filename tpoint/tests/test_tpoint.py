@@ -5,8 +5,8 @@ from astropy.coordinates import SkyCoord, AltAz, Angle
 from astropy.time import Time
 import astropy.units as u
 
-from ..transform import tpoint
-from ..constants import MMT_LOCATION
+from tpoint.transform import tpoint
+from tpoint.constants import MMT_LOCATION
 
 
 def test_tpoint():
