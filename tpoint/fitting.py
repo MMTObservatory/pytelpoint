@@ -60,7 +60,7 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=20000, ntune=4000, target_accept=0.95, ra
         dalt -= tf * pm.math.cos(deg2rad * el)
         dalt -= tx / pm.math.tan(deg2rad * el)
 
-        separations = ( (az - (az_raw + daz/3600.)) ** 2 + (el - (el_raw + dalt/3600.)) ** 2 ) ** 0.5
+        separations = ((az - (az_raw + daz/3600.)) ** 2 + (el - (el_raw + dalt/3600.)) ** 2) ** 0.5
 
         _ = pm.HalfNormal('likelihood', sigma=sigma/3600, observed=separations)
 
