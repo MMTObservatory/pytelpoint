@@ -21,7 +21,7 @@ def pointing_histogram(coo_ref, coo_meas):
     ----------
     coo_ref : `~astropy.coordinates.SkyCoord` instance
         Reference coordinates
-    coo_mes : `~astropy.coordinates.SkyCoord` instance
+    coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
 
     Returns
