@@ -5,10 +5,10 @@ import numpy as np
 import pymc3 as pm
 
 
-def mc_tpoint(coo_ref, coo_meas, nsamp=20000, ntune=4000, target_accept=0.95, random_seed=8675309):
+def mc_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
     """
     Fit full tpoint az/el model using PyMC3. This fit includes the eight normal terms used in
-    `~tpoint.transform.tpoint` with an additional term, sigma, that describes the intrinsic scatter.
+    `~tpoint.transform.tpoint` with additional terms, az_sigma and el_sigma, that describes the intrinsic scatter.
 
     Parameters
     ----------
@@ -16,9 +16,9 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=20000, ntune=4000, target_accept=0.95, ra
         Reference coordinates
     coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
-    nsamp : int (default: 20000)
+    nsamp : int (default: 2000)
         Number of inference samples
-    ntune : int (default: 4000)
+    ntune : int (default: 2000)
         Number of burn-in samples
     target_accept : float (default: 0.95)
         Sets acceptance probability target for determining step size
@@ -33,6 +33,7 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=20000, ntune=4000, target_accept=0.95, ra
     tpoint_model = pm.Model()
     deg2rad = np.pi / 180
     with tpoint_model:
+        # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
         az = pm.Data('az', coo_ref.az)
         el = pm.Data('el', coo_ref.alt)
         az_raw = pm.Data('az_raw', coo_meas.az)
@@ -46,7 +47,8 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=20000, ntune=4000, target_accept=0.95, ra
         npae = pm.Normal('npae', 0., 30.)
         tf = pm.Normal('tf', 0., 50.)
         tx = pm.Normal('tx', 0., 20.)
-        sigma = pm.HalfNormal('sigma', 1.)
+        az_sigma = pm.HalfNormal('az_sigma', sigma=1.)
+        el_sigma = pm.HalfNormal('el_sigma', sigma=1.)
 
         daz = -ia
         daz -= an * pm.math.sin(deg2rad * az) * pm.math.tan(deg2rad * el)
@@ -60,9 +62,8 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=20000, ntune=4000, target_accept=0.95, ra
         dalt -= tf * pm.math.cos(deg2rad * el)
         dalt -= tx / pm.math.tan(deg2rad * el)
 
-        separations = ((az - (az_raw + daz/3600.)) ** 2 + (el - (el_raw + dalt/3600.)) ** 2) ** 0.5
-
-        _ = pm.HalfNormal('likelihood', sigma=sigma/3600, observed=separations)
+        _ = pm.Normal('azerr', mu=0., sigma=az_sigma/3600, observed=az - (az_raw + daz/3600.))
+        _ = pm.Normal('elerr', mu=0., sigma=el_sigma/3600, observed=el - (el_raw + dalt/3600.))
 
         idata = pm.sample(
             nsamp,

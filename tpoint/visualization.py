@@ -223,7 +223,8 @@ def plot_corner(
         'npae': None,
         'tf': None,
         'tx': None,
-        'sigma': None
+        'el_sigma': None,
+        'az_sigma': None
     }
 ):
     """
@@ -237,7 +238,8 @@ def plot_corner(
     quantiles : list of float (default: [0.16, 0.5, 0.84])
         Quantiles to overlay on each histogram plot
     truths : dict
-        Dict of reference parameters to overlay on plots. Must contain the following keys: ia, ie, an, aw, ca, npae, tf, and tx.
+        Dict of reference parameters to overlay on plots. Must contain the following keys:
+        ia, ie, an, aw, ca, npae, tf, tx, el_sigma, and az_sigma.
         Values set to None won't be displayed. Default is to not display any.
 
     Returns
@@ -247,7 +249,7 @@ def plot_corner(
     """
     fig = corner.corner(
         idata,
-        labels=["IA", "IE", "AN", "AW", "CA", "NPAE", "TF", "TX", r"$\sigma$"],
+        labels=["IA", "IE", "AN", "AW", "CA", "NPAE", "TF", "TX", r"$\sigma_{AZ}$", r"$\sigma_{EL}$"],
         quantiles=quantiles,
         truths=truths,
         title_kwargs={"fontsize": 14},
