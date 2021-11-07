@@ -1,10 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-import gzip
-import pkg_resources
-import pickle
-import os
-
 from matplotlib.testing.decorators import cleanup
 
 import astropy.units as u
@@ -45,4 +40,3 @@ def test_pointing_resid():
 def test_pointing_sky():
     f = pointing_sky(COO_REF, COO_MOD)
     assert(f is not None)
-
