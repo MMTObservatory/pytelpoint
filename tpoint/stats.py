@@ -14,7 +14,7 @@ def skyrms(coo_ref, coo_meas):
     ----------
     coo_ref : `~astropy.coordinates.SkyCoord` instance
         Reference coordinates
-    coo_mes : `~astropy.coordinates.SkyCoord` instance
+    coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
 
     Returns:
@@ -35,7 +35,7 @@ def psd(coo_ref, coo_meas, nterms=8):
     ----------
     coo_ref : `~astropy.coordinates.SkyCoord` instance
         Reference coordinates
-    coo_mes : `~astropy.coordinates.SkyCoord` instance
+    coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
     nterms : int (default: 8)
         Number of terms used in the model used to correct coo_meas to match coo_ref
