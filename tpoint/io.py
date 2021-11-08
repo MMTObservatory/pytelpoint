@@ -35,13 +35,17 @@ def read_azel_datfile(filename, data_start=20, obstime=Time.now()):
         Actual observed az/el coordinates for each target, raw az/el coordinates as reported by
         the az/el encoders
     """
-    aa_frame = AltAz(obstime=obstime, location=MMT_LOCATION)
-    t = ascii.read(filename, data_start=data_start, format='no_header', guess=False, fast_reader=False)
-    az_obs = Angle(t['col1'], unit=u.degree).wrap_at(360 * u.deg)
-    el_obs = Angle(t['col2'], unit=u.degree).wrap_at(360 * u.deg)
-    az_raw = Angle(t['col3'], unit=u.degree).wrap_at(360 * u.deg)
-    el_raw = Angle(t['col4'], unit=u.degree).wrap_at(360 * u.deg)
-    coo_obs = SkyCoord(az_obs, el_obs, frame=aa_frame)
-    coo_raw = SkyCoord(az_raw, el_raw, frame=aa_frame)
+    try:
+        aa_frame = AltAz(obstime=obstime, location=MMT_LOCATION)
+        t = ascii.read(filename, data_start=data_start, format='no_header', guess=False, fast_reader=False)
+        az_obs = Angle(t['col1'], unit=u.degree).wrap_at(360 * u.deg)
+        el_obs = Angle(t['col2'], unit=u.degree).wrap_at(360 * u.deg)
+        az_raw = Angle(t['col3'], unit=u.degree).wrap_at(360 * u.deg)
+        el_raw = Angle(t['col4'], unit=u.degree).wrap_at(360 * u.deg)
+        coo_obs = SkyCoord(az_obs, el_obs, frame=aa_frame)
+        coo_raw = SkyCoord(az_raw, el_raw, frame=aa_frame)
 
-    return coo_obs, coo_raw
+        return coo_obs, coo_raw
+    except Exception as e:
+        print(f"Problem reading in {filename}: {e}")
+        return None
