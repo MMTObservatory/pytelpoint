@@ -63,7 +63,7 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, ran
         dalt -= tf * pm.math.cos(deg2rad * el)
         dalt -= tx / pm.math.tan(deg2rad * el)
 
-        _ = pm.Normal('azerr', mu=0., sigma=az_sigma/3600, observed=az - (az_raw + daz/3600.))
+        _ = pm.Normal('azerr', mu=0., sigma=az_sigma/3600, observed=pm.math.cos(deg2rad * el) * (az - (az_raw + daz/3600.)))
         _ = pm.Normal('elerr', mu=0., sigma=el_sigma/3600, observed=el - (el_raw + dalt/3600.))
 
         idata = pm.sample(
