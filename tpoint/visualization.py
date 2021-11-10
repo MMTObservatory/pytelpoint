@@ -252,6 +252,7 @@ def plot_corner(
         labels=["IA", "IE", "AN", "AW", "CA", "NPAE", "TF", "TX", r"$\sigma_{AZ}$", r"$\sigma_{EL}$"],
         quantiles=quantiles,
         truths=truths,
+        show_titles=True,
         title_kwargs={"fontsize": 14},
         label_kwargs={"fontsize": 12}
     )
