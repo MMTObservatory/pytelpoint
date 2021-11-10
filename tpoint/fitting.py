@@ -2,6 +2,7 @@
 
 import numpy as np
 
+import arviz
 import pymc3 as pm
 
 
@@ -73,3 +74,25 @@ def mc_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, ran
             random_seed=random_seed
         )
     return idata
+
+
+def best_fit_pars(idata):
+    """
+    Pull out the best fit parameters from an mc_tpoint fit and return them as a dict.
+
+    Parameters
+    ----------
+    idata : `~arviz.InferenceData`
+        Inference data from mc_tpoint().
+
+    Returns
+    -------
+    tpoint_pars : dict
+        Best-fit tpoint parameters
+    """
+    t_fit = arviz.summary(idata, round_to=8)
+    tpoint_pars = {}
+    for p in ['ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx']:
+        tpoint_pars[p] = t_fit.loc[p, 'mean']
+
+    return tpoint_pars

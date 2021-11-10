@@ -3,7 +3,7 @@
 import os
 import pkg_resources
 
-from tpoint.fitting import mc_tpoint
+from tpoint.fitting import mc_tpoint, best_fit_pars
 from tpoint.visualization import plot_corner, plot_posterior
 from tpoint.io import read_azel_datfile
 
@@ -19,3 +19,6 @@ def test_mc_fitting():
 
     cfig = plot_corner(idata)
     assert(cfig is not None)
+
+    tpars = best_fit_pars(idata)
+    assert(tpars is not None)
