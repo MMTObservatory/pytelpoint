@@ -108,13 +108,13 @@ def read_raw_datfile(filename, obstime=Time.now()):
         # flag for calculated position
         t_re = re.compile("^TAA:")
 
-        for l in lines:
-            if a_re.match(l):
-                line_data = l.split()
+        for line in lines:
+            if a_re.match(line):
+                line_data = line.split()
                 az_raw.append(180.0 - float(line_data[2]))
                 el_raw.append(float(line_data[1]))
-            if t_re.match(l):
-                line_data = l.split()
+            if t_re.match(line):
+                line_data = line.split()
                 az_obs.append(180.0 - float(line_data[2]))
                 el_obs.append(line_data[1])
 
