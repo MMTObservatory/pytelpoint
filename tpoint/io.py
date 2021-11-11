@@ -1,11 +1,43 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import re
+
 import astropy.units as u
 from astropy.io import ascii
 from astropy.coordinates import SkyCoord, Angle, AltAz
 from astropy.time import Time
 
 from tpoint.constants import MMT_LOCATION
+
+
+def _mk_azel_coords(az_ref, el_ref, az_meas, el_meas, obstime=Time.now()):
+    """
+    Take reference and measaured arrays of az and el, assumed to be in degrees, construct Angles from them,
+    and return reference and measured SkyCoord objects.
+
+    Parameters
+    ----------
+    az_ref, el_ref, az_meas, el_meas : array-like or list-like
+        Arrays containing reference azimuth, reference elevation, measured azimuth, and measured elevation.
+    obstime : `~astropy.time.Time`
+        Time the data were taken. This is pretty strictly optional since mount code takes this into
+        account when calculating the astrometric az/el for each target.
+
+    Returns
+    -------
+    coo_ref, coo_meas : `~astropy.coordinates.SkyCoord` instances
+        Actual az/el coordinates for each target, measured az/el coordinates as reported by, e.g.,
+        az/el encoders
+    """
+    aa_frame = AltAz(obstime=obstime, location=MMT_LOCATION)
+    az_ref = Angle(az_ref, unit=u.degree).wrap_at(360 * u.deg)
+    el_ref = Angle(el_ref, unit=u.degree).wrap_at(360 * u.deg)
+    az_meas = Angle(az_meas, unit=u.degree).wrap_at(360 * u.deg)
+    el_meas = Angle(el_meas, unit=u.degree).wrap_at(360 * u.deg)
+    coo_ref = SkyCoord(az_ref, el_ref, frame=aa_frame)
+    coo_meas = SkyCoord(az_meas, el_meas, frame=aa_frame)
+
+    return coo_ref, coo_meas
 
 
 def read_azel_datfile(filename, data_start=20, obstime=Time.now()):
@@ -36,16 +68,59 @@ def read_azel_datfile(filename, data_start=20, obstime=Time.now()):
         the az/el encoders
     """
     try:
-        aa_frame = AltAz(obstime=obstime, location=MMT_LOCATION)
         t = ascii.read(filename, data_start=data_start, format='no_header', guess=False, fast_reader=False)
-        az_obs = Angle(t['col1'], unit=u.degree).wrap_at(360 * u.deg)
-        el_obs = Angle(t['col2'], unit=u.degree).wrap_at(360 * u.deg)
-        az_raw = Angle(t['col3'], unit=u.degree).wrap_at(360 * u.deg)
-        el_raw = Angle(t['col4'], unit=u.degree).wrap_at(360 * u.deg)
-        coo_obs = SkyCoord(az_obs, el_obs, frame=aa_frame)
-        coo_raw = SkyCoord(az_raw, el_raw, frame=aa_frame)
+
+        coo_obs, coo_raw = _mk_azel_coords(t['col1'], t['col2'], t['col3'], t['col4'], obstime=obstime)
 
         return coo_obs, coo_raw
     except Exception as e:
         print(f"Problem reading in {filename}: {e}")
+        return None
+
+
+def read_raw_datfile(filename, obstime=Time.now()):
+    """
+    This reads the raw pointing data files as produced by the MMTO mount code.
+
+    Parameters
+    ----------
+    filename : str
+        Name of the data file to read
+    obstime : `~astropy.time.Time`
+        Time the data were taken. This is pretty strictly optional since mount code takes this into
+        account when calculating the astrometric az/el for each target.
+
+    Returns
+    -------
+    coo_obs, coo_raw : `~astropy.coordinates.SkyCoord` instances
+        Actual observed az/el coordinates for each target, raw az/el coordinates as reported by
+        the az/el encoders
+    """
+    try:
+        az_obs, el_obs, az_raw, el_raw = [], [], [], []
+
+        with open(filename, 'r') as fp:
+            lines = fp.readlines()
+
+        # flag for raw encoder position
+        a_re = re.compile("^RAA:")
+
+        # flag for calculated position
+        t_re = re.compile("^TAA:")
+
+        for l in lines:
+            if a_re.match(l):
+                line_data = l.split()
+                az_raw.append(180.0 - float(line_data[2]))
+                el_raw.append(float(line_data[1]))
+            if t_re.match(l):
+                line_data = l.split()
+                az_obs.append(180.0 - float(line_data[2]))
+                el_obs.append(line_data[1])
+
+        coo_obs, coo_raw = _mk_azel_coords(az_obs, el_obs, az_raw, el_raw, obstime=obstime)
+
+        return coo_obs, coo_raw
+    except Exception as e:
+        print(f"Problem reading in raw pointing data {filename}: {e}")
         return None
