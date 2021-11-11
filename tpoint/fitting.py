@@ -92,7 +92,7 @@ def best_fit_pars(idata):
     """
     t_fit = arviz.summary(idata, round_to=8)
     tpoint_pars = {}
-    for p in ['ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx']:
+    for p in ['ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma']:
         tpoint_pars[p] = t_fit.loc[p, 'mean']
 
     return tpoint_pars

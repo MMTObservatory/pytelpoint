@@ -15,7 +15,8 @@ def tpoint(
         ca=0.,
         npae=0.,
         tf=0.,
-        tx=0.):
+        tx=0.,
+        **kwargs):
     """
     Apply 8-term alt-az TPOINT model to set of raw alt-az coordinates and return corrected coordinates.
     Parameter names match those used by TPOINT: IA, IE, AN, AW, CA, NPAE, TF, and TX. See TPOINT documentation
