@@ -6,7 +6,7 @@ import arviz
 import pymc3 as pm
 
 
-def mc_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
+def azel_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
     """
     Fit full tpoint az/el model using PyMC3. This fit includes the eight normal terms used in
     `~tpoint.transform.tpoint` with additional terms, az_sigma and el_sigma, that describes the intrinsic scatter.
