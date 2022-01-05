@@ -5,8 +5,10 @@ import numpy as np
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 
+__all__ = ['azel_model']
 
-def tpoint(
+
+def azel_model(
         coo,
         ia=0.,
         ie=0.,
@@ -18,14 +20,14 @@ def tpoint(
         tx=0.,
         **kwargs):
     """
-    Apply 8-term alt-az TPOINT model to set of raw alt-az coordinates and return corrected coordinates.
-    Parameter names match those used by TPOINT: IA, IE, AN, AW, CA, NPAE, TF, and TX. See TPOINT documentation
+    Apply 8-term alt-az pointing model to set of raw alt-az coordinates and return corrected coordinates.
+    Parameter names match those used by TPOINT(tm): IA, IE, AN, AW, CA, NPAE, TF, and TX. See TPOINT(tm) documentation
     for more details.
 
     Parameters
     ----------
     coo : `~astropy.coordinates.SkyCoord` instance
-        Raw Az-El coordinates to correct via TPOINT model. Must be in an AltAz frame.
+        Raw Az-El coordinates to correct via pointing model model. Must be in an AltAz frame.
     ia : float (default: 0)
         Azimuth index value (i.e. zeropoint)
     ie : float (default: 0)
@@ -49,10 +51,10 @@ def tpoint(
     Returns
     -------
     new_coo : `~astropy.coordinates.SkyCoord` instance
-        New coordinates with tpoint model applied.
+        New coordinates with azel pointing model applied.
     """
     if coo.frame.name != 'altaz':
-        raise ValueError("TPOINT model can only be applied to AltAz coordinates.")
+        raise ValueError("azel_model can only be applied to AltAz coordinates.")
 
     da = -1 * ia
     da -= an * np.sin(coo.az) * np.tan(coo.alt)

@@ -5,8 +5,10 @@ import numpy as np
 import arviz
 import pymc3 as pm
 
+__all__ = ['azel_fit', 'best_fit_pars']
 
-def azel_point(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
+
+def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
     """
     Fit full az/el pointing model using PyMC3. The terms are analogous to those used by TPOINT(tm). This fit includes
     the eight normal terms used in `~pypoint.transform.azel` with additional terms, az_sigma and el_sigma, that

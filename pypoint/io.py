@@ -7,7 +7,9 @@ from astropy.io import ascii
 from astropy.coordinates import SkyCoord, Angle, AltAz
 from astropy.time import Time
 
-from tpoint.constants import MMT_LOCATION
+from pypoint.constants import MMT_LOCATION
+
+__all__ = ['read_azel_datfile', 'read_raw_datfile']
 
 
 def _mk_azel_coords(az_ref, el_ref, az_meas, el_meas, obstime=Time.now()):
@@ -55,7 +57,7 @@ def read_azel_datfile(filename, data_start=20, obstime=Time.now()):
         Name of the data file to read
     data_start : int (default: 20)
         Where the pointing data starts within the file. This should be the default of 20 if the file
-        has the header info that the old TPOINT program requires. This should be 0 for a bare file
+        has the header info that the old TPOINT(tm) program requires. This should be 0 for a bare file
         that doesn't contain that.
     obstime : `~astropy.time.Time`
         Time the data were taken. This is pretty strictly optional since mount code takes this into

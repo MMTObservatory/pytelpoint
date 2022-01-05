@@ -3,15 +3,15 @@
 import os
 import pkg_resources
 
-from tpoint.fitting import azel_tpoint, best_fit_pars
-from tpoint.visualization import plot_corner, plot_posterior
-from tpoint.io import read_azel_datfile
+from pypoint.fitting import azel_fit, best_fit_pars
+from pypoint.visualization import plot_corner, plot_posterior
+from pypoint.io import read_azel_datfile
 
 
 def test_mc_fitting():
-    test_file = pkg_resources.resource_filename("tpoint", os.path.join("test_data", "k_and_e.dat"))
+    test_file = pkg_resources.resource_filename("pypoint", os.path.join("test_data", "k_and_e.dat"))
     coo_ref, coo_meas = read_azel_datfile(test_file)
-    idata = azel_tpoint(coo_ref, coo_meas, nsamp=200, ntune=200)
+    idata = azel_fit(coo_ref, coo_meas, nsamp=200, ntune=200)
     assert(idata is not None)
 
     pfig = plot_posterior(idata)

@@ -10,7 +10,16 @@ import arviz
 
 import astropy.units as u
 
-from tpoint.stats import psd, skyrms
+from pypoint.stats import psd, skyrms
+
+__all__ = [
+    'pointing_histogram',
+    'pointing_residuals',
+    'pointing_sky',
+    'pointing_azel_resid',
+    'plot_corner',
+    'plot_posterior'
+]
 
 
 def pointing_histogram(coo_ref, coo_meas):
@@ -228,7 +237,7 @@ def plot_corner(
     }
 ):
     """
-    Make corner plot from outputs of a pymc3 tpoint fit
+    Make corner plot from outputs of a pymc3 az/el fit
 
     Parameters
     ----------
@@ -261,7 +270,7 @@ def plot_corner(
 
 def plot_posterior(idata):
     """
-    Make posterior probability distributions plot from a pymc3 tpoint fit
+    Make posterior probability distributions plot from a pymc3 fit
 
     Parameters
     ----------

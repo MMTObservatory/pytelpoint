@@ -4,10 +4,12 @@ import numpy as np
 
 import astropy.units as u
 
+__all__ = ["skyrms", "psd"]
+
 
 def skyrms(coo_ref, coo_meas):
     """
-    Calculate sky RMS of the offsets between reference and measured coordinates in the same way as tpoint.
+    Calculate sky RMS of the offsets between reference and measured coordinates in the same way as TPOINT(tm).
     Return the result in arcseconds.
 
     Parameters
@@ -29,7 +31,7 @@ def skyrms(coo_ref, coo_meas):
 
 def psd(coo_ref, coo_meas, nterms=8):
     """
-    Calculate the population standard deviation, PSD, the way tpoint does. Returh the result in arcseconds.
+    Calculate the population standard deviation, PSD, the way TPOINT(tm) does. Return the result in arcseconds.
 
     Parameters
     ----------
