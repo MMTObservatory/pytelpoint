@@ -6,10 +6,11 @@ import arviz
 import pymc3 as pm
 
 
-def azel_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
+def azel_point(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
     """
-    Fit full tpoint az/el model using PyMC3. This fit includes the eight normal terms used in
-    `~tpoint.transform.tpoint` with additional terms, az_sigma and el_sigma, that describes the intrinsic scatter.
+    Fit full az/el pointing model using PyMC3. The terms are analogous to those used by TPOINT(tm). This fit includes
+    the eight normal terms used in `~pypoint.transform.azel` with additional terms, az_sigma and el_sigma, that
+    describes the intrinsic scatter.
 
     Parameters
     ----------
@@ -29,11 +30,11 @@ def azel_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, r
     Returns
     -------
     idata : `~arviz.InferenceData`
-        Inference data from the tpoint model
+        Inference data from the pointing model
     """
-    tpoint_model = pm.Model()
+    pointing_model = pm.Model()
     deg2rad = np.pi / 180
-    with tpoint_model:
+    with pointing_model:
         # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
         az = pm.Data('az', coo_ref.az)
         el = pm.Data('el', coo_ref.alt)
@@ -78,21 +79,21 @@ def azel_tpoint(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, r
 
 def best_fit_pars(idata):
     """
-    Pull out the best fit parameters from an mc_tpoint fit and return them as a dict.
+    Pull out the best fit parameters from a pointing model fit and return them as a dict.
 
     Parameters
     ----------
     idata : `~arviz.InferenceData`
-        Inference data from mc_tpoint().
+        Inference data from pointing model.
 
     Returns
     -------
-    tpoint_pars : dict
-        Best-fit tpoint parameters
+    pointing_pars : dict
+        Best-fit pointing parameters
     """
     t_fit = arviz.summary(idata, round_to=8)
-    tpoint_pars = {}
+    pointing_pars = {}
     for p in ['ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma']:
-        tpoint_pars[p] = t_fit.loc[p, 'mean']
+        pointing_pars[p] = t_fit.loc[p, 'mean']
 
-    return tpoint_pars
+    return pointing_pars
