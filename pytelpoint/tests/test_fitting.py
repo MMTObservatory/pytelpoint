@@ -3,13 +3,13 @@
 import os
 import pkg_resources
 
-from pypoint.fitting import azel_fit, best_fit_pars
-from pypoint.visualization import plot_corner, plot_posterior
-from pypoint.io import read_azel_datfile
+from pytelpoint.fitting import azel_fit, best_fit_pars
+from pytelpoint.visualization import plot_corner, plot_posterior
+from pytelpoint.io import read_azel_datfile
 
 
 def test_mc_fitting():
-    test_file = pkg_resources.resource_filename("pypoint", os.path.join("test_data", "k_and_e.dat"))
+    test_file = pkg_resources.resource_filename("pytelpoint", os.path.join("test_data", "k_and_e.dat"))
     coo_ref, coo_meas = read_azel_datfile(test_file)
     idata = azel_fit(coo_ref, coo_meas, nsamp=200, ntune=200)
     assert(idata is not None)

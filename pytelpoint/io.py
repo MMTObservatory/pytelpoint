@@ -7,7 +7,7 @@ from astropy.io import ascii
 from astropy.coordinates import SkyCoord, Angle, AltAz
 from astropy.time import Time
 
-from pypoint.constants import MMT_LOCATION
+from pytelpoint.constants import MMT_LOCATION
 
 __all__ = ['read_azel_datfile', 'read_raw_datfile']
 

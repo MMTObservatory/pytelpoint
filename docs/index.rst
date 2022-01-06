@@ -1,14 +1,14 @@
 Documentation
 =============
 
-This is the documentation for pypoint.
+This is the documentation for pytelpoint.
 
 .. toctree::
   :maxdepth: 2
 
-  pypoint/index.rst
+  pytelpoint/index.rst
 
 .. note:: The layout of this directory is simply a suggestion.  To follow
           traditional practice, do *not* edit this page, but instead place
-          all documentation for the package inside ``pypoint/``.
+          all documentation for the package inside ``pytelpoint/``.
           You can follow this practice or choose your own layout.

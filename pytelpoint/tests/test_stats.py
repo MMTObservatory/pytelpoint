@@ -5,9 +5,9 @@ import astropy.units as u
 from astropy.coordinates import Angle, AltAz, SkyCoord
 from astropy.time import Time
 
-from pypoint.stats import skyrms, psd
-from pypoint.constants import MMT_LOCATION
-from pypoint.transform import azel_model
+from pytelpoint.stats import skyrms, psd
+from pytelpoint.constants import MMT_LOCATION
+from pytelpoint.transform import azel_model
 
 
 OBSTIME = Time("2021-08-21T06:00:00", format='isot')

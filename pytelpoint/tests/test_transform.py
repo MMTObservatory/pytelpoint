@@ -5,8 +5,8 @@ from astropy.coordinates import SkyCoord, AltAz, Angle
 from astropy.time import Time
 import astropy.units as u
 
-from pypoint.transform import azel_model
-from pypoint.constants import MMT_LOCATION
+from pytelpoint.transform import azel_model
+from pytelpoint.constants import MMT_LOCATION
 
 
 def test_azel_model():

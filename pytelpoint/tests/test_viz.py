@@ -6,9 +6,9 @@ import astropy.units as u
 from astropy.coordinates import Angle, AltAz, SkyCoord
 from astropy.time import Time
 
-from pypoint.constants import MMT_LOCATION
-from pypoint.transform import azel_model
-from pypoint.visualization import pointing_histogram, pointing_azel_resid, pointing_residuals, pointing_sky
+from pytelpoint.constants import MMT_LOCATION
+from pytelpoint.transform import azel_model
+from pytelpoint.visualization import pointing_histogram, pointing_azel_resid, pointing_residuals, pointing_sky
 
 OBSTIME = Time("2021-08-21T06:00:00", format='isot')
 AA_FRAME = AltAz(obstime=OBSTIME, location=MMT_LOCATION)

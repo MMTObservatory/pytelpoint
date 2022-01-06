@@ -5,12 +5,12 @@ import pkg_resources
 
 from astropy.tests.helper import assert_quantity_allclose as assert_allclose
 
-from pypoint.io import read_azel_datfile, read_raw_datfile
+from pytelpoint.io import read_azel_datfile, read_raw_datfile
 
 
 def test_read_azel_datfile():
-    proc_file = pkg_resources.resource_filename("pypoint", os.path.join("test_data", "k_and_e.dat"))
-    raw_file = pkg_resources.resource_filename("pypoint", os.path.join("test_data", "point_20210821.dat"))
+    proc_file = pkg_resources.resource_filename("pytelpoint", os.path.join("test_data", "k_and_e.dat"))
+    raw_file = pkg_resources.resource_filename("pytelpoint", os.path.join("test_data", "point_20210821.dat"))
 
     proc_coords = read_azel_datfile(proc_file)
     assert(proc_coords is not None)

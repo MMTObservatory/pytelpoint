@@ -4,11 +4,11 @@ include setup.cfg
 include LICENSE.rst
 include pyproject.toml
 
-recursive-include pypoint *.pyx *.c *.pxd
+recursive-include pytelpoint *.pyx *.c *.pxd
 recursive-include docs *
 recursive-include licenses *
 recursive-include scripts *
-recursive-include pypoint/test_data *
+recursive-include pytelpoint/test_data *
 
 prune build
 prune docs/_build

@@ -10,7 +10,7 @@ import arviz
 
 import astropy.units as u
 
-from pypoint.stats import psd, skyrms
+from pytelpoint.stats import psd, skyrms
 
 __all__ = [
     'pointing_histogram',

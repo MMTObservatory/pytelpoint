@@ -5,12 +5,12 @@ Python utilities for analyzing MMTO pointing and tracking
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
-.. image:: https://github.com/MMTObservatory/pypoint/workflows/CI%20Tests/badge.svg
-    :target: https://github.com/MMTObservatory/pypoint/actions
+.. image:: https://github.com/MMTObservatory/pytelpoint/workflows/CI%20Tests/badge.svg
+    :target: https://github.com/MMTObservatory/pytelpoint/actions
     :alt: CI Tests status
 
-.. image:: https://codecov.io/gh/MMTObservatory/pypoint/branch/main/graph/badge.svg?token=SV8E0QZ9XI
-    :target: https://codecov.io/gh/MMTObservatory/pypoint
+.. image:: https://codecov.io/gh/MMTObservatory/pytelpoint/branch/main/graph/badge.svg?token=SV8E0QZ9XI
+    :target: https://codecov.io/gh/MMTObservatory/pytelpoint
     :alt: Code coverage status
 
 License
