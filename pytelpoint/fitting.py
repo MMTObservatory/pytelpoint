@@ -3,7 +3,7 @@
 import numpy as np
 
 import arviz
-import pymc3 as pm
+import pymc as pm
 
 __all__ = ['azel_fit', 'best_fit_pars']
 

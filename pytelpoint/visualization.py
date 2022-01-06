@@ -237,7 +237,7 @@ def plot_corner(
     }
 ):
     """
-    Make corner plot from outputs of a pymc3 az/el fit
+    Make corner plot from outputs of a pymc az/el fit
 
     Parameters
     ----------
@@ -270,7 +270,7 @@ def plot_corner(
 
 def plot_posterior(idata):
     """
-    Make posterior probability distributions plot from a pymc3 fit
+    Make posterior probability distributions plot from a pymc fit
 
     Parameters
     ----------
