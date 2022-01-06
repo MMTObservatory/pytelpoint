@@ -1,0 +1,12 @@
+We present a Python package, pypoint, that provides an open-source way to
+model telescope pointing and visualize pointing performance. Models are
+implemented that are analogous to those used by TPoint™ so that the results
+can be easily adapted to existing control systems. The model fitting is performed
+using PyMC (https://docs.pymc.io/). PyMC provides an easy-to-use syntax for building
+and describing models along with cutting edge algorithms for fitting the models to data.
+While slower than commonly-used linear regression techniques, the Bayesian probabilistic
+approach that PyMC enables provides much more robust assessments of the uncertainties
+in the model parameters, the correlations between parameters, and the intrinsic scatter in
+the observations. Initial development is concentrated on modeling altitude-azimuth
+telescopes like the MMTO, but the approach used is easily generalized to other designs
+and outside contributions are encouraged.
