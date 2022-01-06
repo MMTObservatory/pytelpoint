@@ -1,4 +1,4 @@
-We present a Python package, pypoint, that provides an open-source way to
+We present a Python package, PyTelPoint, that provides an open-source way to
 model telescope pointing and visualize pointing performance. Models are
 implemented that are analogous to those used by TPoint™ so that the results
 can be easily adapted to existing control systems. The model fitting is performed
