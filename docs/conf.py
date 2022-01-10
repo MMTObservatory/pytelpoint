@@ -106,7 +106,7 @@ release = package.__version__
 
 
 html_theme_options = {
-    'logotext1': 'pytpoint',  # white,  semi-bold
+    'logotext1': 'pytelpoint',  # white,  semi-bold
     'logotext2': '',  # orange, light
     'logotext3': ':docs'   # white,  light
     }
@@ -136,7 +136,7 @@ html_title = '{0} v{1}'.format(project, release)
 htmlhelp_basename = project + 'doc'
 
 # Prefixes that are ignored for sorting the Python module index
-modindex_common_prefix = ["tpoint."]
+modindex_common_prefix = ["pytelpoint."]
 
 
 # -- Options for LaTeX output -------------------------------------------------
@@ -174,7 +174,7 @@ github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_pr
 # -- Options for linkcheck output -------------------------------------------
 linkcheck_retry = 5
 linkcheck_ignore = [
-    r'https://github\.com/mmtobservatory/pytpoint/(?:issues|pull)/\d+',
+    r'https://github\.com/mmtobservatory/pytelpoint/(?:issues|pull)/\d+',
 ]
 linkcheck_timeout = 180
 linkcheck_anchors = False
