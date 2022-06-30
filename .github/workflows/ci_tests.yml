@@ -24,12 +24,12 @@ jobs:
         include:
           - name: Code style checks
             os: ubuntu-latest
-            python: 3.10
+            python: '3.10'
             toxenv: codestyle
 
           - name: Python 3.10 with all optional dependencies and coverage checking
             os: ubuntu-latest
-            python: 3.10
+            python: '3.10'
             toxenv: py310-test-alldeps-cov
 
     steps:
