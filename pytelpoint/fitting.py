@@ -8,11 +8,19 @@ import pymc as pm
 __all__ = ['azel_fit', 'best_fit_pars']
 
 
-def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309, cores=None):
+def azel_fit(
+    coo_ref,
+    coo_meas,
+    nsamp=2000,
+    ntune=500,
+    target_accept=0.95,
+    random_seed=8675309,
+    cores=None,
+    init_pars={}):
     """
     Fit full az/el pointing model using PyMC3. The terms are analogous to those used by TPOINT(tm). This fit includes
-    the eight normal terms used in `~pytelpoint.transform.azel` with additional terms, az_sigma and el_sigma, that
-    describes the intrinsic scatter.
+    the eight normal terms used and described in `~pytelpoint.transform.azel` with additional terms,
+    az_sigma and el_sigma, that describe the intrinsic/observational scatter.
 
     Parameters
     ----------
@@ -22,7 +30,7 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
         Measured coordinates
     nsamp : int (default: 2000)
         Number of inference samples per chain
-    ntune : int (default: 2000)
+    ntune : int (default: 500)
         Number of burn-in samples per chain
     target_accept : float (default: 0.95)
         Sets acceptance probability target for determining step size
@@ -31,6 +39,10 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
     cores : int (default: None)
         Number of cores to use for parallel chains. The default of None
         will use the number of available cores, but no more than 4.
+    init_pars : dict (default: {})
+        Initial guesses for the fit parameters. Keys are the same those provided by
+        `~pytelpoint.fitting.best_fit_pars` and described in `~pytelpoint.transform.azel`:
+        'ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma'
 
     Returns
     -------
@@ -46,16 +58,16 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
         az_raw = pm.ConstantData('az_raw', coo_meas.az.value)
         el_raw = pm.ConstantData('el_raw', coo_meas.alt.value)
 
-        ia = pm.Normal('ia', 1200., 100)
-        ie = pm.Normal('ie', 0., 50.)
-        an = pm.Normal('an', 0., 20.)
-        aw = pm.Normal('aw', 0., 20.)
-        ca = pm.Normal('ca', 0., 30.)
-        npae = pm.Normal('npae', 0., 30.)
-        tf = pm.Normal('tf', 0., 50.)
-        tx = pm.Normal('tx', 0., 20.)
-        az_sigma = pm.HalfNormal('az_sigma', sigma=1.)
-        el_sigma = pm.HalfNormal('el_sigma', sigma=1.)
+        ia = pm.Normal('ia', init_pars.get('ia', 1200.), 100)
+        ie = pm.Normal('ie', init_pars.get('ie', 0.), 50.)
+        an = pm.Normal('an', init_pars.get('an', 0.), 20.)
+        aw = pm.Normal('aw', init_pars.get('aw', 0.), 20.)
+        ca = pm.Normal('ca', init_pars.get('ca', 0.), 30.)
+        npae = pm.Normal('npae', init_pars.get('npae', 0.), 30.)
+        tf = pm.Normal('tf', init_pars.get('tf', 0.), 50.)
+        tx = pm.Normal('tx', init_pars.get('tx', 0.), 20.)
+        az_sigma = pm.HalfNormal('az_sigma', sigma=init_pars.get('az_sigma', 1.))
+        el_sigma = pm.HalfNormal('el_sigma', sigma=init_pars.get('el_sigma', 1.))
 
         daz = -ia
         daz -= an * pm.math.sin(deg2rad * az) * pm.math.tan(deg2rad * el)
