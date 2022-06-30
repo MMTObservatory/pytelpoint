@@ -38,10 +38,10 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
     deg2rad = np.pi / 180
     with pointing_model:
         # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
-        az = pm.Data('az', coo_ref.az)
-        el = pm.Data('el', coo_ref.alt)
-        az_raw = pm.Data('az_raw', coo_meas.az)
-        el_raw = pm.Data('el_raw', coo_meas.alt)
+        az = pm.ConstantData('az', coo_ref.az)
+        el = pm.ConstantData('el', coo_ref.alt)
+        az_raw = pm.ConstantData('az_raw', coo_meas.az)
+        el_raw = pm.ConstantData('el_raw', coo_meas.alt)
 
         ia = pm.Normal('ia', 1200., 100)
         ie = pm.Normal('ie', 0., 50.)
