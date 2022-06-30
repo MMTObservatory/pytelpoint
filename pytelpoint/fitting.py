@@ -9,18 +9,18 @@ __all__ = ['azel_fit', 'best_fit_pars']
 
 
 def azel_fit(
-    coo_ref,
-    coo_meas,
-    nsamp=2000,
-    ntune=500,
-    target_accept=0.95,
-    random_seed=8675309,
-    cores=None,
-    init_pars={}):
+        coo_ref,
+        coo_meas,
+        nsamp=2000,
+        ntune=500,
+        target_accept=0.95,
+        random_seed=8675309,
+        cores=None,
+        init_pars={}):
     """
     Fit full az/el pointing model using PyMC3. The terms are analogous to those used by TPOINT(tm). This fit includes
     the eight normal terms used and described in `~pytelpoint.transform.azel` with additional terms,
-    az_sigma and el_sigma, that describe the intrinsic/observational scatter.
+    az_sigma and el_sigma, that describeq the intrinsic/observational scatter.
 
     Parameters
     ----------
