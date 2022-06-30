@@ -8,7 +8,7 @@ import pymc as pm
 __all__ = ['azel_fit', 'best_fit_pars']
 
 
-def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309):
+def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, random_seed=8675309, cores=None):
     """
     Fit full az/el pointing model using PyMC3. The terms are analogous to those used by TPOINT(tm). This fit includes
     the eight normal terms used in `~pytelpoint.transform.azel` with additional terms, az_sigma and el_sigma, that
@@ -38,10 +38,10 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
     deg2rad = np.pi / 180
     with pointing_model:
         # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
-        az = pm.ConstantData('az', coo_ref.az)
-        el = pm.ConstantData('el', coo_ref.alt)
-        az_raw = pm.ConstantData('az_raw', coo_meas.az)
-        el_raw = pm.ConstantData('el_raw', coo_meas.alt)
+        az = pm.ConstantData('az', coo_ref.az.value)
+        el = pm.ConstantData('el', coo_ref.alt.value)
+        az_raw = pm.ConstantData('az_raw', coo_meas.az.value)
+        el_raw = pm.ConstantData('el_raw', coo_meas.alt.value)
 
         ia = pm.Normal('ia', 1200., 100)
         ie = pm.Normal('ie', 0., 50.)
@@ -77,7 +77,8 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
             tune=ntune,
             target_accept=target_accept,
             return_inferencedata=True,
-            random_seed=random_seed
+            random_seed=random_seed,
+            cores=cores
         )
     return idata
 
