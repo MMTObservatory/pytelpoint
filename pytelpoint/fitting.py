@@ -21,13 +21,16 @@ def azel_fit(coo_ref, coo_meas, nsamp=2000, ntune=2000, target_accept=0.95, rand
     coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
     nsamp : int (default: 2000)
-        Number of inference samples
+        Number of inference samples per chain
     ntune : int (default: 2000)
-        Number of burn-in samples
+        Number of burn-in samples per chain
     target_accept : float (default: 0.95)
         Sets acceptance probability target for determining step size
     random_seed : int (default: 8675309)
         Seed number for random number generator
+    cores : int (default: None)
+        Number of cores to use for parallel chains. The default of None
+        will use the number of available cores, but no more than 4.
 
     Returns
     -------
