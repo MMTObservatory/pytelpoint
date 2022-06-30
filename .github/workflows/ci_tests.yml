@@ -24,19 +24,18 @@ jobs:
         include:
           - name: Code style checks
             os: ubuntu-latest
-            python: 3.9
+            python: '3.10'
             toxenv: codestyle
 
-          - name: Python 3.9 with all optional dependencies and coverage checking
+          - name: Python 3.10 with all optional dependencies and coverage checking
             os: ubuntu-latest
-            python: 3.9
-            toxenv: py39-test-alldeps-cov
+            python: '3.10'
+            toxenv: py310-test-alldeps-cov
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        lfs: true
         fetch-depth: 0
     - name: Set up python ${{ matrix.python }} on ${{ matrix.os }}
       uses: actions/setup-python@v2
@@ -45,7 +44,7 @@ jobs:
     - name: Install base dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox tox-conda codecov
+        python -m pip install tox codecov
     - name: Test with tox
       run: |
         tox -e ${{ matrix.toxenv }}

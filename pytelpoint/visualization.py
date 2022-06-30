@@ -83,7 +83,7 @@ def pointing_histogram(coo_ref, coo_meas):
     return fig
 
 
-def pointing_residuals(coo_ref, coo_meas):
+def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
     """
     Plot of pointing residuals in az/el space
 
@@ -93,6 +93,9 @@ def pointing_residuals(coo_ref, coo_meas):
         Reference coordinates
     coo_mes : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    circle_size : float (default: 1.)
+        Size of reference circle to plot with residuals. Set to None
+        for no circle.
 
     Returns
     -------
@@ -109,9 +112,18 @@ def pointing_residuals(coo_ref, coo_meas):
         ax.set_xlabel(r"$\Delta$A (arcsec)")
         ax.set_ylabel(r"$\Delta$E (arcsec)")
         ax.set_title("Azimuth-Elevation Residuals")
-        c1 = matplotlib.patches.Circle((0, 0), 1, ec='black', lw=4, fill=False, alpha=0.4, label="1\"")
-        ax.add_patch(c1)
-        ax.legend()
+        if circle_size is not None:
+            c1 = matplotlib.patches.Circle(
+                    (0, 0),
+                    circle_size,
+                    ec='black',
+                    lw=4,
+                    fill=False,
+                    alpha=0.4,
+                    label=f"{circle_size}\""
+                )
+            ax.add_patch(c1)
+            ax.legend()
     return fig
 
 
@@ -237,7 +249,7 @@ def plot_corner(
     }
 ):
     """
-    Make corner plot from outputs of a pymc3 az/el fit
+    Make corner plot from outputs of a pymc az/el fit
 
     Parameters
     ----------
@@ -270,7 +282,7 @@ def plot_corner(
 
 def plot_posterior(idata):
     """
-    Make posterior probability distributions plot from a pymc3 fit
+    Make posterior probability distributions plot from a pymc fit
 
     Parameters
     ----------
