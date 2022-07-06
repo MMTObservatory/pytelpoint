@@ -234,22 +234,7 @@ def pointing_azel_resid(coo_ref, coo_meas):
     return fig
 
 
-def plot_corner(
-    idata,
-    quantiles=[0.16, 0.5, 0.84],
-    truths={
-        'ia': None,
-        'ie': None,
-        'an': None,
-        'aw': None,
-        'ca': None,
-        'npae': None,
-        'tf': None,
-        'tx': None,
-        'el_sigma': None,
-        'az_sigma': None
-    }
-):
+def plot_corner(idata, quantiles=None, truths=None):
     """
     Make corner plot from outputs of a pymc az/el fit
 
@@ -258,7 +243,7 @@ def plot_corner(
     idata : object
         Any object that can be converted to an `~arviz.InferenceData` object. Refer to documentation of
         arviz.convert_to_dataset for details.
-    quantiles : list of float (default: [0.16, 0.5, 0.84])
+    quantiles : list of float (default: None -> [0.16, 0.5, 0.84])
         Quantiles to overlay on each histogram plot
     truths : dict
         Dict of reference parameters to overlay on plots. Must contain the following keys:
@@ -270,6 +255,22 @@ def plot_corner(
     fig : `matplotlib.figure.Figure` instance
         Figure object containing the corner plot.
     """
+    if quantiles is None:
+        quantiles = [0.16, 0.5, 0.84]
+    if truths is None:
+        truths = {
+            'ia': None,
+            'ie': None,
+            'an': None,
+            'aw': None,
+            'ca': None,
+            'npae': None,
+            'tf': None,
+            'tx': None,
+            'el_sigma': None,
+            'az_sigma': None
+        }
+
     pars = best_fit_pars(idata)
     labels = []
     for p in pars.keys():

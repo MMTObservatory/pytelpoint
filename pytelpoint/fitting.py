@@ -8,8 +8,8 @@ import pymc as pm
 __all__ = ['azel_fit', 'best_fit_pars']
 
 DEG2RAD = np.pi / 180
-AZEL_TERMS = ['ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx']
-HADEC_TERMS = ['ih', 'id', 'np', 'ch', 'ma', 'me', 'tf']
+AZEL_TERMS = ('ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx')
+HADEC_TERMS = ('ih', 'id', 'np', 'ch', 'ma', 'me', 'tf')
 
 AZIMUTH_FUNCS = {
     'ia': lambda az, el: -1.0,
@@ -37,8 +37,10 @@ def azel_fit(
         random_seed=8675309,
         cores=None,
         fit_terms=AZEL_TERMS,
-        init_pars={'ia': 1200.},
-        prior_sigmas={'ia': 100., 'ie': 50.}):
+        fixed_terms=None,
+        init_pars=None,
+        prior_sigmas=None
+):
     """
     Fit full az/el pointing model using PyMC. The terms are analogous to those used by TPOINT(tm). This fit includes
     the eight normal terms used and described in `~pytelpoint.transform.azel` with additional terms,
@@ -61,15 +63,17 @@ def azel_fit(
     cores : int (default: None)
         Number of cores to use for parallel chains. The default of None
         will use the number of available cores, but no more than 4.
-    fit_terms : list (default: AZEL_TERMS)
-        List of az/el model terms to include in the fit.
-    init_pars : dict (default: {'ia': 1200.})
+    fit_terms : list-like (default: AZEL_TERMS)
+        Model terms to include in the fit.
+    fixed_terms : dict (default: {})
+        Dict of terms to fix to a specified value.
+    init_pars : dict (default: None -> {'ia': 1200.})
         Initial guesses for the fit parameters. Keys are the same those provided by
         `~pytelpoint.fitting.best_fit_pars` and described in `~pytelpoint.transform.azel`:
         'ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma'.
         The default for 'ia' is appropriate for the MMTO. If not specified, then the initial
         guess for a parameter is assumed to be 0.
-    prior_sigmas : dict (default: {'ia': 100., 'ie': 50.})
+    prior_sigmas : dict (default: None -> {'ia': 100., 'ie': 50.})
         The priors for the fit parameters are assumed to be `~pymc.Normal` distributions. The sigmas
         for these can be specified here. The index parameters, 'ia' and 'ie', have default sigma values
         of 100 and 50, respectively. The rest default to 25 if not specified.
@@ -79,6 +83,13 @@ def azel_fit(
     idata : `~arviz.InferenceData`
         Inference data from the pointing model
     """
+    if fixed_terms is None:
+        fixed_terms = {}
+    if init_pars is None:
+        init_pars = {'ia': 1200.}
+    if prior_sigmas is None:
+        prior_sigmas = {'ia': 100., 'ie': 50.}
+
     pointing_model = pm.Model()
 
     with pointing_model:
@@ -90,23 +101,27 @@ def azel_fit(
 
         terms = {}
 
-        for term in fit_terms:
+        combined_terms = list(fit_terms) + list(fixed_terms.keys())
+        for term in combined_terms:
             if term not in AZEL_TERMS:
                 raise ValueError(f"Invalid az/el fitting term, {term}.")
-            terms[term] = pm.Normal(term, init_pars.get(term, 0.0), prior_sigmas.get(term, 25.))
+            if term in fixed_terms:
+                terms[term] = fixed_terms[term]
+            else:
+                terms[term] = pm.Normal(term, init_pars.get(term, 0.0), prior_sigmas.get(term, 25.))
 
         az_sigma = pm.HalfNormal('az_sigma', sigma=init_pars.get('az_sigma', 1.))
         el_sigma = pm.HalfNormal('el_sigma', sigma=init_pars.get('el_sigma', 1.))
 
         daz = 0.0
         for k, f in AZIMUTH_FUNCS.items():
-            if k in fit_terms:
+            if k in combined_terms:
                 daz += terms[k] * f(az, el)
 
         # using 'dalt' because 'del' is a python built-in
         dalt = 0.0
         for k, f in ELEVATION_FUNCS.items():
-            if k in fit_terms:
+            if k in combined_terms:
                 dalt += terms[k] * f(az, el)
 
         # models are the raw encoder values plus pointing model; observed are the actual az/el
