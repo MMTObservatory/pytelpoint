@@ -7,6 +7,26 @@ import pymc as pm
 
 __all__ = ['azel_fit', 'best_fit_pars']
 
+DEG2RAD = np.pi / 180
+AZEL_TERMS = ['ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx']
+HADEC_TERMS = ['ih', 'id', 'np', 'ch', 'ma', 'me', 'tf']
+
+AZIMUTH_FUNCS = {
+    'ia': lambda az, el: -1.0,
+    'an': lambda az, el: -1.0 * pm.math.sin(DEG2RAD * az) * pm.math.tan(DEG2RAD * el),
+    'aw': lambda az, el: -1.0 * pm.math.cos(DEG2RAD * az) * pm.math.tan(DEG2RAD * el),
+    'ca': lambda az, el: -1.0 / pm.math.cos(DEG2RAD * el),
+    'npae': lambda az, el: -1.0 * pm.math.tan(DEG2RAD * el)
+}
+
+ELEVATION_FUNCS = {
+    'ie': lambda az, el: 1.0,
+    'an': lambda az, el: -1.0 * pm.math.cos(DEG2RAD * az),
+    'aw': lambda az, el: pm.math.sin(DEG2RAD * az),
+    'tf': lambda az, el: -1.0 * pm.math.cos(DEG2RAD * el),
+    'tx': lambda az, el: -1.0 / pm.math.tan(DEG2RAD * el)
+}
+
 
 def azel_fit(
         coo_ref,
@@ -16,9 +36,11 @@ def azel_fit(
         target_accept=0.95,
         random_seed=8675309,
         cores=None,
-        init_pars={}):
+        fit_terms=AZEL_TERMS,
+        init_pars={'ia': 1200.},
+        prior_sigmas={'ia': 100., 'ie': 50.}):
     """
-    Fit full az/el pointing model using PyMC3. The terms are analogous to those used by TPOINT(tm). This fit includes
+    Fit full az/el pointing model using PyMC. The terms are analogous to those used by TPOINT(tm). This fit includes
     the eight normal terms used and described in `~pytelpoint.transform.azel` with additional terms,
     az_sigma and el_sigma, that describeq the intrinsic/observational scatter.
 
@@ -39,10 +61,18 @@ def azel_fit(
     cores : int (default: None)
         Number of cores to use for parallel chains. The default of None
         will use the number of available cores, but no more than 4.
-    init_pars : dict (default: {})
+    fit_terms : list (default: AZEL_TERMS)
+        List of az/el model terms to include in the fit.
+    init_pars : dict (default: {'ia': 1200.})
         Initial guesses for the fit parameters. Keys are the same those provided by
         `~pytelpoint.fitting.best_fit_pars` and described in `~pytelpoint.transform.azel`:
-        'ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma'
+        'ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma'.
+        The default for 'ia' is appropriate for the MMTO. If not specified, then the initial
+        guess for a parameter is assumed to be 0.
+    prior_sigmas : dict (default: {'ia': 100., 'ie': 50.})
+        The priors for the fit parameters are assumed to be `~pymc.Normal` distributions. The sigmas
+        for these can be specified here. The index parameters, 'ia' and 'ie', have default sigma values
+        of 100 and 50, respectively. The rest default to 25 if not specified.
 
     Returns
     -------
@@ -50,7 +80,7 @@ def azel_fit(
         Inference data from the pointing model
     """
     pointing_model = pm.Model()
-    deg2rad = np.pi / 180
+
     with pointing_model:
         # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
         az = pm.ConstantData('az', coo_ref.az.value)
@@ -58,28 +88,26 @@ def azel_fit(
         az_raw = pm.ConstantData('az_raw', coo_meas.az.value)
         el_raw = pm.ConstantData('el_raw', coo_meas.alt.value)
 
-        ia = pm.Normal('ia', init_pars.get('ia', 1200.), 100)
-        ie = pm.Normal('ie', init_pars.get('ie', 0.), 50.)
-        an = pm.Normal('an', init_pars.get('an', 0.), 20.)
-        aw = pm.Normal('aw', init_pars.get('aw', 0.), 20.)
-        ca = pm.Normal('ca', init_pars.get('ca', 0.), 30.)
-        npae = pm.Normal('npae', init_pars.get('npae', 0.), 30.)
-        tf = pm.Normal('tf', init_pars.get('tf', 0.), 50.)
-        tx = pm.Normal('tx', init_pars.get('tx', 0.), 20.)
+        terms = {}
+
+        for term in fit_terms:
+            if term not in AZEL_TERMS:
+                raise ValueError(f"Invalid az/el fitting term, {term}.")
+            terms[term] = pm.Normal(term, init_pars.get(term, 0.0), prior_sigmas.get(term, 25.))
+
         az_sigma = pm.HalfNormal('az_sigma', sigma=init_pars.get('az_sigma', 1.))
         el_sigma = pm.HalfNormal('el_sigma', sigma=init_pars.get('el_sigma', 1.))
 
-        daz = -ia
-        daz -= an * pm.math.sin(deg2rad * az) * pm.math.tan(deg2rad * el)
-        daz -= aw * pm.math.cos(deg2rad * az) * pm.math.tan(deg2rad * el)
-        daz -= ca / pm.math.cos(deg2rad * el)
-        daz -= npae * pm.math.tan(deg2rad * el)
+        daz = 0.0
+        for k, f in AZIMUTH_FUNCS.items():
+            if k in fit_terms:
+                daz += terms[k] * f(az, el)
 
-        dalt = ie
-        dalt -= an * pm.math.cos(deg2rad * az)
-        dalt += aw * pm.math.sin(deg2rad * az)
-        dalt -= tf * pm.math.cos(deg2rad * el)
-        dalt -= tx / pm.math.tan(deg2rad * el)
+        # using 'dalt' because 'del' is a python built-in
+        dalt = 0.0
+        for k, f in ELEVATION_FUNCS.items():
+            if k in fit_terms:
+                dalt += terms[k] * f(az, el)
 
         # models are the raw encoder values plus pointing model; observed are the actual az/el
         mu_az = az_raw + daz/3600.
