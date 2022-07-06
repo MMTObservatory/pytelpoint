@@ -9,8 +9,10 @@ import corner
 import arviz
 
 import astropy.units as u
+from astropy.visualization import hist
 
 from pytelpoint.stats import psd, skyrms
+from pytelpoint.fitting import best_fit_pars
 
 __all__ = [
     'pointing_histogram',
@@ -22,7 +24,7 @@ __all__ = [
 ]
 
 
-def pointing_histogram(coo_ref, coo_meas):
+def pointing_histogram(coo_ref, coo_meas, bins='freedman'):
     """
     Plot histogram of separations between reference coordinates, coo_ref, and measured coordinates, coo_meas.
 
@@ -41,8 +43,7 @@ def pointing_histogram(coo_ref, coo_meas):
     seps = coo_ref.separation(coo_meas)
     with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
         fig, ax = plt.subplots(figsize=[9, 6])
-        bins = np.arange(0, 20)/4  # 0.25" bins
-        ax.hist(seps.to(u.arcsec).value, bins=bins, alpha=0.6)
+        hist(seps.to(u.arcsec).value, bins=bins, ax=ax, histtype='stepfilled', alpha=0.6)
         ax.set_ylabel("N")
         ax.set_xlabel("Pointing Error (arcsec)")
         med = np.median(seps.to(u.arcsec))
@@ -79,7 +80,6 @@ def pointing_histogram(coo_ref, coo_meas):
             label=f"PSD: {skypsd.value:.2f}\""
         )
         ax.legend()
-        ax.set_xlim(0.0, 5.0)
     return fig
 
 
@@ -107,8 +107,10 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
         fig, ax = plt.subplots(figsize=[6, 6])
         ax.set_aspect('equal')
         ax.scatter(az_res.to(u.arcsec), el_res.to(u.arcsec))
-        ax.set_xlim([-5, 5])
-        ax.set_ylim([-5, 5])
+        if circle_size is not None:
+            ax_size = 5 * circle_size
+            ax.set_xlim([-ax_size, ax_size])
+            ax.set_ylim([-ax_size, ax_size])
         ax.set_xlabel(r"$\Delta$A (arcsec)")
         ax.set_ylabel(r"$\Delta$E (arcsec)")
         ax.set_title("Azimuth-Elevation Residuals")
@@ -268,9 +270,18 @@ def plot_corner(
     fig : `matplotlib.figure.Figure` instance
         Figure object containing the corner plot.
     """
+    pars = best_fit_pars(idata)
+    labels = []
+    for p in pars.keys():
+        if 'sigma' in p:
+            ax, _ = p.split('_')
+            labels.append("$\\sigma_{" + ax.upper() + "}$")
+        else:
+            labels.append(p.upper())
+
     fig = corner.corner(
         idata,
-        labels=["IA", "IE", "AN", "AW", "CA", "NPAE", "TF", "TX", r"$\sigma_{AZ}$", r"$\sigma_{EL}$"],
+        labels=labels,
         quantiles=quantiles,
         truths=truths,
         show_titles=True,
