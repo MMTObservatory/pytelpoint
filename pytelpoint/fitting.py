@@ -5,6 +5,8 @@ import numpy as np
 import arviz
 import pymc as pm
 
+import astropy.units as u
+
 __all__ = ['azel_fit', 'best_fit_pars']
 
 DEG2RAD = np.pi / 180
@@ -94,10 +96,11 @@ def azel_fit(
 
     with pointing_model:
         # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
-        az = pm.ConstantData('az', coo_ref.az.value)
-        el = pm.ConstantData('el', coo_ref.alt.value)
-        az_raw = pm.ConstantData('az_raw', coo_meas.az.value)
-        el_raw = pm.ConstantData('el_raw', coo_meas.alt.value)
+        # they should be in degrees, but are converted here just in case.
+        az = pm.ConstantData('az', coo_ref.az.to(u.deg).value)
+        el = pm.ConstantData('el', coo_ref.alt.to(u.deg).value)
+        az_raw = pm.ConstantData('az_raw', coo_meas.az.to(u.deg).value)
+        el_raw = pm.ConstantData('el_raw', coo_meas.alt.to(u.deg).value)
 
         terms = {}
 
