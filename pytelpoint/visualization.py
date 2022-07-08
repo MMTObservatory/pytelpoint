@@ -24,7 +24,7 @@ __all__ = [
 ]
 
 
-def pointing_histogram(coo_ref, coo_meas, bins='freedman'):
+def pointing_histogram(coo_ref, coo_meas, bins='freedman', style='ggplot'):
     """
     Plot histogram of separations between reference coordinates, coo_ref, and measured coordinates, coo_meas.
 
@@ -34,6 +34,11 @@ def pointing_histogram(coo_ref, coo_meas, bins='freedman'):
         Reference coordinates
     coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    bins : str (default: freedman)
+        Name of algorithm to use to calculate optimal bin sizes. See `~astropy.visualization.hist` for options
+        and descriptions.
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -41,7 +46,7 @@ def pointing_histogram(coo_ref, coo_meas, bins='freedman'):
         Figure object containing the histogram plot.
     """
     seps = coo_ref.separation(coo_meas)
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
         fig, ax = plt.subplots(figsize=[9, 6])
         hist(seps.to(u.arcsec).value, bins=bins, ax=ax, histtype='stepfilled', alpha=0.6)
         ax.set_ylabel("N")
@@ -83,7 +88,7 @@ def pointing_histogram(coo_ref, coo_meas, bins='freedman'):
     return fig
 
 
-def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
+def pointing_residuals(coo_ref, coo_meas, circle_size=1.0, style="ggplot"):
     """
     Plot of pointing residuals in az/el space
 
@@ -96,6 +101,8 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
     circle_size : float (default: 1.)
         Size of reference circle to plot with residuals. Set to None
         for no circle.
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -103,7 +110,7 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
         Figure object containing the residuals plot.
     """
     az_res, el_res = coo_meas.spherical_offsets_to(coo_ref)
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
         fig, ax = plt.subplots(figsize=[6, 6])
         ax.set_aspect('equal')
         ax.scatter(az_res.to(u.arcsec), el_res.to(u.arcsec))
@@ -129,7 +136,7 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
     return fig
 
 
-def pointing_sky(coo_ref, coo_meas):
+def pointing_sky(coo_ref, coo_meas, style="ggplot"):
     """
     Plot of pointing errors as a function of sky position
 
@@ -139,6 +146,8 @@ def pointing_sky(coo_ref, coo_meas):
         Reference coordinates
     coo_mes : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -146,7 +155,7 @@ def pointing_sky(coo_ref, coo_meas):
         Figure object containing the pointing errors plot.
     """
     az_res, el_res = coo_meas.spherical_offsets_to(coo_ref)
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
         x = coo_ref.az
         y = 90 * u.degree - coo_ref.alt  # use zenith angle here as a trick
         uu = (az_res).to(u.arcsec).value
@@ -185,7 +194,7 @@ def pointing_sky(coo_ref, coo_meas):
     return fig
 
 
-def pointing_azel_resid(coo_ref, coo_meas):
+def pointing_azel_resid(coo_ref, coo_meas, style="ggplot"):
     """
     Plot of az/el pointing residuals as a function of az/el
 
@@ -195,6 +204,8 @@ def pointing_azel_resid(coo_ref, coo_meas):
         Reference coordinates
     coo_mes : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -207,7 +218,7 @@ def pointing_azel_resid(coo_ref, coo_meas):
     az = coo_ref.az
     el = coo_ref.alt
     azel_max = np.max([5, np.abs(az_res).max().to(u.arcsec).value, np.abs(el_res).max().to(u.arcsec).value])
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
         fig, axs = plt.subplots(2, 2, figsize=(12, 8), sharex='col', sharey='row')
 
         axs[0, 0].set_ylim(-azel_max, azel_max)
