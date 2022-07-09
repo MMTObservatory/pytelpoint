@@ -245,7 +245,7 @@ def pointing_azel_resid(coo_ref, coo_meas, style="ggplot"):
     return fig
 
 
-def plot_corner(idata, quantiles=None, truths=None):
+def plot_corner(idata, quantiles=None, truths=None, title_kwargs={"fontsize": 18}, label_kwargs={"fontsize": 16}):
     """
     Make corner plot from outputs of a pymc az/el fit
 
@@ -266,25 +266,18 @@ def plot_corner(idata, quantiles=None, truths=None):
     fig : `matplotlib.figure.Figure` instance
         Figure object containing the corner plot.
     """
+    if truths is None:
+        truths = {}
+
     if quantiles is None:
         quantiles = [0.16, 0.5, 0.84]
-    if truths is None:
-        truths = {
-            'ia': None,
-            'ie': None,
-            'an': None,
-            'aw': None,
-            'ca': None,
-            'npae': None,
-            'tf': None,
-            'tx': None,
-            'el_sigma': None,
-            'az_sigma': None
-        }
 
     pars = best_fit_pars(idata)
     labels = []
     for p in pars.keys():
+        if p not in truths:
+            truths[p] = None
+
         if 'sigma' in p:
             ax, _ = p.split('_')
             labels.append("$\\sigma_{" + ax.upper() + "}$")
@@ -297,8 +290,8 @@ def plot_corner(idata, quantiles=None, truths=None):
         quantiles=quantiles,
         truths=truths,
         show_titles=True,
-        title_kwargs={"fontsize": 14},
-        label_kwargs={"fontsize": 12}
+        title_kwargs=title_kwargs,
+        label_kwargs=label_kwargs
     )
     return fig
 
