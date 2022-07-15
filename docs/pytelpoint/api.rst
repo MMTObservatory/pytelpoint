@@ -1,8 +1,8 @@
-************************
-PyTelPoint Documentation
-************************
+****************************
+PyTelPoint API Documentation
+****************************
 
-This is the documentation for pytelpoint.
+This is the detailed API documentation for pytelpoint as generated from docstrings within the code.
 
 Reference/API
 =============
