@@ -47,6 +47,7 @@ def pointing_histogram(coo_ref, coo_meas, bins='freedman', style='ggplot'):
     """
     seps = coo_ref.separation(coo_meas)
     with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+        matplotlib.rcParams.update({'font.size': 15})
         fig, ax = plt.subplots(figsize=[9, 6])
         hist(seps.to(u.arcsec).value, bins=bins, ax=ax, histtype='stepfilled', alpha=0.6)
         ax.set_ylabel("N")
@@ -85,6 +86,7 @@ def pointing_histogram(coo_ref, coo_meas, bins='freedman', style='ggplot'):
             label=f"PSD: {skypsd.value:.2f}\""
         )
         ax.legend()
+        plt.tight_layout()
     return fig
 
 
@@ -111,6 +113,7 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0, style="ggplot"):
     """
     az_res, el_res = coo_meas.spherical_offsets_to(coo_ref)
     with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+        matplotlib.rcParams.update({'font.size': 16})
         fig, ax = plt.subplots(figsize=[6, 6])
         ax.set_aspect('equal')
         ax.scatter(az_res.to(u.arcsec), el_res.to(u.arcsec))
@@ -133,6 +136,7 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0, style="ggplot"):
                 )
             ax.add_patch(c1)
             ax.legend()
+        plt.tight_layout()
     return fig
 
 
@@ -155,7 +159,8 @@ def pointing_sky(coo_ref, coo_meas, style="ggplot"):
         Figure object containing the pointing errors plot.
     """
     az_res, el_res = coo_meas.spherical_offsets_to(coo_ref)
-    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 16, 'ytick.labelsize': 16}):
+        matplotlib.rcParams.update({'font.size': 14})
         x = coo_ref.az
         y = 90 * u.degree - coo_ref.alt  # use zenith angle here as a trick
         uu = (az_res).to(u.arcsec).value
@@ -188,9 +193,9 @@ def pointing_sky(coo_ref, coo_meas, style="ggplot"):
         ax.set_theta_zero_location('N')
         ax.set_theta_direction(-1)
         ax.scatter(x.to(u.radian).value, y.value)
-    cbar = plt.colorbar(qq, shrink=0.7)
-    cbar.set_label("arcsec")
-    plt.tight_layout()
+        cbar = plt.colorbar(qq, shrink=0.7)
+        cbar.set_label("arcsec")
+        plt.tight_layout()
     return fig
 
 
@@ -219,6 +224,7 @@ def pointing_azel_resid(coo_ref, coo_meas, style="ggplot"):
     el = coo_ref.alt
     azel_max = np.max([5, np.abs(az_res).max().to(u.arcsec).value, np.abs(el_res).max().to(u.arcsec).value])
     with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+        matplotlib.rcParams.update({'font.size': 16})
         fig, axs = plt.subplots(2, 2, figsize=(12, 8), sharex='col', sharey='row')
 
         axs[0, 0].set_ylim(-azel_max, azel_max)
