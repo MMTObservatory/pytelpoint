@@ -13,6 +13,10 @@ Python utilities for analyzing telescope pointing performance
     :target: https://codecov.io/gh/MMTObservatory/pytelpoint
     :alt: Code coverage status
 
+.. image:: https://readthedocs.org/projects/pytelpoint/badge/?version=latest
+    :target: https://pytelpoint.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 License
 -------
 
