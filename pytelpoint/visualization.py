@@ -9,8 +9,10 @@ import corner
 import arviz
 
 import astropy.units as u
+from astropy.visualization import hist
 
 from pytelpoint.stats import psd, skyrms
+from pytelpoint.fitting import best_fit_pars
 
 __all__ = [
     'pointing_histogram',
@@ -22,7 +24,7 @@ __all__ = [
 ]
 
 
-def pointing_histogram(coo_ref, coo_meas):
+def pointing_histogram(coo_ref, coo_meas, bins='freedman', style='ggplot'):
     """
     Plot histogram of separations between reference coordinates, coo_ref, and measured coordinates, coo_meas.
 
@@ -32,6 +34,11 @@ def pointing_histogram(coo_ref, coo_meas):
         Reference coordinates
     coo_meas : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    bins : str (default: freedman)
+        Name of algorithm to use to calculate optimal bin sizes. See `~astropy.visualization.hist` for options
+        and descriptions.
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -39,10 +46,10 @@ def pointing_histogram(coo_ref, coo_meas):
         Figure object containing the histogram plot.
     """
     seps = coo_ref.separation(coo_meas)
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+        matplotlib.rcParams.update({'font.size': 15})
         fig, ax = plt.subplots(figsize=[9, 6])
-        bins = np.arange(0, 20)/4  # 0.25" bins
-        ax.hist(seps.to(u.arcsec).value, bins=bins, alpha=0.6)
+        hist(seps.to(u.arcsec).value, bins=bins, ax=ax, histtype='stepfilled', alpha=0.6)
         ax.set_ylabel("N")
         ax.set_xlabel("Pointing Error (arcsec)")
         med = np.median(seps.to(u.arcsec))
@@ -79,11 +86,11 @@ def pointing_histogram(coo_ref, coo_meas):
             label=f"PSD: {skypsd.value:.2f}\""
         )
         ax.legend()
-        ax.set_xlim(0.0, 5.0)
+        plt.tight_layout()
     return fig
 
 
-def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
+def pointing_residuals(coo_ref, coo_meas, circle_size=1.0, style="ggplot"):
     """
     Plot of pointing residuals in az/el space
 
@@ -96,6 +103,8 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
     circle_size : float (default: 1.)
         Size of reference circle to plot with residuals. Set to None
         for no circle.
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -103,12 +112,15 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
         Figure object containing the residuals plot.
     """
     az_res, el_res = coo_meas.spherical_offsets_to(coo_ref)
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+        matplotlib.rcParams.update({'font.size': 16})
         fig, ax = plt.subplots(figsize=[6, 6])
         ax.set_aspect('equal')
         ax.scatter(az_res.to(u.arcsec), el_res.to(u.arcsec))
-        ax.set_xlim([-5, 5])
-        ax.set_ylim([-5, 5])
+        if circle_size is not None:
+            ax_size = 5 * circle_size
+            ax.set_xlim([-ax_size, ax_size])
+            ax.set_ylim([-ax_size, ax_size])
         ax.set_xlabel(r"$\Delta$A (arcsec)")
         ax.set_ylabel(r"$\Delta$E (arcsec)")
         ax.set_title("Azimuth-Elevation Residuals")
@@ -124,10 +136,11 @@ def pointing_residuals(coo_ref, coo_meas, circle_size=1.0):
                 )
             ax.add_patch(c1)
             ax.legend()
+        plt.tight_layout()
     return fig
 
 
-def pointing_sky(coo_ref, coo_meas):
+def pointing_sky(coo_ref, coo_meas, style="ggplot"):
     """
     Plot of pointing errors as a function of sky position
 
@@ -137,6 +150,8 @@ def pointing_sky(coo_ref, coo_meas):
         Reference coordinates
     coo_mes : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -144,7 +159,8 @@ def pointing_sky(coo_ref, coo_meas):
         Figure object containing the pointing errors plot.
     """
     az_res, el_res = coo_meas.spherical_offsets_to(coo_ref)
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 16, 'ytick.labelsize': 16}):
+        matplotlib.rcParams.update({'font.size': 14})
         x = coo_ref.az
         y = 90 * u.degree - coo_ref.alt  # use zenith angle here as a trick
         uu = (az_res).to(u.arcsec).value
@@ -177,13 +193,13 @@ def pointing_sky(coo_ref, coo_meas):
         ax.set_theta_zero_location('N')
         ax.set_theta_direction(-1)
         ax.scatter(x.to(u.radian).value, y.value)
-    cbar = plt.colorbar(qq, shrink=0.7)
-    cbar.set_label("arcsec")
-    plt.tight_layout()
+        cbar = plt.colorbar(qq, shrink=0.7)
+        cbar.set_label("arcsec")
+        plt.tight_layout()
     return fig
 
 
-def pointing_azel_resid(coo_ref, coo_meas):
+def pointing_azel_resid(coo_ref, coo_meas, style="ggplot"):
     """
     Plot of az/el pointing residuals as a function of az/el
 
@@ -193,6 +209,8 @@ def pointing_azel_resid(coo_ref, coo_meas):
         Reference coordinates
     coo_mes : `~astropy.coordinates.SkyCoord` instance
         Measured coordinates
+    style : str (default: ggplot)
+        Matplotlib style to apply to the plot
 
     Returns
     -------
@@ -205,7 +223,8 @@ def pointing_azel_resid(coo_ref, coo_meas):
     az = coo_ref.az
     el = coo_ref.alt
     azel_max = np.max([5, np.abs(az_res).max().to(u.arcsec).value, np.abs(el_res).max().to(u.arcsec).value])
-    with plt.style.context('ggplot', {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+    with plt.style.context(style, {'xtick.labelsize': 18, 'ytick.labelsize': 18}):
+        matplotlib.rcParams.update({'font.size': 16})
         fig, axs = plt.subplots(2, 2, figsize=(12, 8), sharex='col', sharey='row')
 
         axs[0, 0].set_ylim(-azel_max, azel_max)
@@ -232,22 +251,7 @@ def pointing_azel_resid(coo_ref, coo_meas):
     return fig
 
 
-def plot_corner(
-    idata,
-    quantiles=[0.16, 0.5, 0.84],
-    truths={
-        'ia': None,
-        'ie': None,
-        'an': None,
-        'aw': None,
-        'ca': None,
-        'npae': None,
-        'tf': None,
-        'tx': None,
-        'el_sigma': None,
-        'az_sigma': None
-    }
-):
+def plot_corner(idata, quantiles=None, truths=None, title_kwargs={"fontsize": 18}, label_kwargs={"fontsize": 16}):
     """
     Make corner plot from outputs of a pymc az/el fit
 
@@ -256,7 +260,7 @@ def plot_corner(
     idata : object
         Any object that can be converted to an `~arviz.InferenceData` object. Refer to documentation of
         arviz.convert_to_dataset for details.
-    quantiles : list of float (default: [0.16, 0.5, 0.84])
+    quantiles : list of float (default: None -> [0.16, 0.5, 0.84])
         Quantiles to overlay on each histogram plot
     truths : dict
         Dict of reference parameters to overlay on plots. Must contain the following keys:
@@ -268,14 +272,32 @@ def plot_corner(
     fig : `matplotlib.figure.Figure` instance
         Figure object containing the corner plot.
     """
+    if truths is None:
+        truths = {}
+
+    if quantiles is None:
+        quantiles = [0.16, 0.5, 0.84]
+
+    pars = best_fit_pars(idata)
+    labels = []
+    for p in pars.keys():
+        if p not in truths:
+            truths[p] = None
+
+        if 'sigma' in p:
+            ax, _ = p.split('_')
+            labels.append("$\\sigma_{" + ax.upper() + "}$")
+        else:
+            labels.append(p.upper())
+
     fig = corner.corner(
         idata,
-        labels=["IA", "IE", "AN", "AW", "CA", "NPAE", "TF", "TX", r"$\sigma_{AZ}$", r"$\sigma_{EL}$"],
+        labels=labels,
         quantiles=quantiles,
         truths=truths,
         show_titles=True,
-        title_kwargs={"fontsize": 14},
-        label_kwargs={"fontsize": 12}
+        title_kwargs=title_kwargs,
+        label_kwargs=label_kwargs
     )
     return fig
 

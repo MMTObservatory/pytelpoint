@@ -1,5 +1,5 @@
-Python utilities for analyzing MMTO pointing and tracking
----------------------------------------------------------
+Python utilities for analyzing telescope pointing performance
+-------------------------------------------------------------
 
 .. image:: http://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
     :target: http://www.astropy.org
@@ -12,6 +12,10 @@ Python utilities for analyzing MMTO pointing and tracking
 .. image:: https://codecov.io/gh/MMTObservatory/pytelpoint/branch/main/graph/badge.svg?token=SV8E0QZ9XI
     :target: https://codecov.io/gh/MMTObservatory/pytelpoint
     :alt: Code coverage status
+
+.. image:: https://readthedocs.org/projects/pytelpoint/badge/?version=latest
+    :target: https://pytelpoint.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 License
 -------
