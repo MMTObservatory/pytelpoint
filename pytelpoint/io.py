@@ -14,22 +14,23 @@ __all__ = ['read_azel_datfile', 'read_raw_datfile']
 
 def _mk_azel_coords(az_ref, el_ref, az_meas, el_meas, obstime=Time.now()):
     """
-    Take reference and measaured arrays of az and el, assumed to be in degrees, construct Angles from them,
-    and return reference and measured SkyCoord objects.
+    Take reference and measaured arrays of az and el, assumed to be in degrees,
+    construct Angles from them, and return reference and measured SkyCoord objects.
 
     Parameters
     ----------
     az_ref, el_ref, az_meas, el_meas : array-like or list-like
-        Arrays containing reference azimuth, reference elevation, measured azimuth, and measured elevation.
+        Arrays containing reference azimuth, reference elevation, measured azimuth,
+        and measured elevation.
     obstime : `~astropy.time.Time`
-        Time the data were taken. This is pretty strictly optional since mount code takes this into
-        account when calculating the astrometric az/el for each target.
+        Time the data were taken. This is pretty strictly optional since mount code
+        takes this into account when calculating the astrometric az/el for each target.
 
     Returns
     -------
     coo_ref, coo_meas : `~astropy.coordinates.SkyCoord` instances
-        Actual az/el coordinates for each target, measured az/el coordinates as reported by, e.g.,
-        az/el encoders
+        Actual az/el coordinates for each target, measured az/el coordinates as
+        reported by, e.g., az/el encoders
     """
     aa_frame = AltAz(obstime=obstime, location=MMT_LOCATION)
     az_ref = Angle(az_ref, unit=u.degree).wrap_at(360 * u.deg)
@@ -48,31 +49,44 @@ def read_azel_datfile(filename, data_start=20, obstime=Time.now()):
 
     az observed, alt observed, az raw, el raw
 
-    where the observed values are calculated from the targets' astronomy and observation time and the
-    raw values are as reported by the axis encoders. All values in units of degrees.
+    where the observed values are calculated from the targets' astronomy and observation
+    time and the raw values are as reported by the axis encoders. All values in units of
+    degrees.
 
     Parameters
     ----------
     filename : str
         Name of the data file to read
     data_start : int (default: 20)
-        Where the pointing data starts within the file. This should be the default of 20 if the file
-        has the header info that the old TPOINT(tm) program requires. This should be 0 for a bare file
-        that doesn't contain that.
+        Where the pointing data starts within the file. This should be the default of 20
+        if the file has the header info that the old TPOINT(tm) program requires. This
+        should be 0 for a bare file that doesn't contain that.
     obstime : `~astropy.time.Time`
-        Time the data were taken. This is pretty strictly optional since mount code takes this into
-        account when calculating the astrometric az/el for each target.
+        Time the data were taken. This is pretty strictly optional since mount code
+        takes this into account when calculating the astrometric az/el for each target.
 
     Returns
     -------
     coo_obs, coo_raw : `~astropy.coordinates.SkyCoord` instances
-        Actual observed az/el coordinates for each target, raw az/el coordinates as reported by
-        the az/el encoders
+        Actual observed az/el coordinates for each target, raw az/el coordinates as
+        reported by the az/el encoders
     """
     try:
-        t = ascii.read(filename, data_start=data_start, format='no_header', guess=False, fast_reader=False)
+        t = ascii.read(
+            filename,
+            data_start=data_start,
+            format='no_header',
+            guess=False,
+            fast_reader=False
+        )
 
-        coo_obs, coo_raw = _mk_azel_coords(t['col1'], t['col2'], t['col3'], t['col4'], obstime=obstime)
+        coo_obs, coo_raw = _mk_azel_coords(
+            t['col1'],
+            t['col2'],
+            t['col3'],
+            t['col4'],
+            obstime=obstime
+        )
 
         return coo_obs, coo_raw
     except Exception as e:
@@ -89,14 +103,14 @@ def read_raw_datfile(filename, obstime=Time.now()):
     filename : str
         Name of the data file to read
     obstime : `~astropy.time.Time`
-        Time the data were taken. This is pretty strictly optional since mount code takes this into
-        account when calculating the astrometric az/el for each target.
+        Time the data were taken. This is pretty strictly optional since mount code
+        takes this into account when calculating the astrometric az/el for each target.
 
     Returns
     -------
     coo_obs, coo_raw : `~astropy.coordinates.SkyCoord` instances
-        Actual observed az/el coordinates for each target, raw az/el coordinates as reported by
-        the az/el encoders
+        Actual observed az/el coordinates for each target, raw az/el coordinates as
+        reported by the az/el encoders
     """
     try:
         az_obs, el_obs, az_raw, el_raw = [], [], [], []
@@ -120,7 +134,13 @@ def read_raw_datfile(filename, obstime=Time.now()):
                 az_obs.append(180.0 - float(line_data[2]))
                 el_obs.append(line_data[1])
 
-        coo_obs, coo_raw = _mk_azel_coords(az_obs, el_obs, az_raw, el_raw, obstime=obstime)
+        coo_obs, coo_raw = _mk_azel_coords(
+            az_obs,
+            el_obs,
+            az_raw,
+            el_raw,
+            obstime=obstime
+        )
 
         return coo_obs, coo_raw
     except Exception as e:

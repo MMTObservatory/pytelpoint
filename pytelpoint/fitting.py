@@ -44,9 +44,10 @@ def azel_fit(
         prior_sigmas=None
 ):
     """
-    Fit full az/el pointing model using PyMC. The terms are analogous to those used by TPOINT(tm). This fit includes
-    the eight normal terms used and described in `~pytelpoint.transform.azel` with additional terms,
-    az_sigma and el_sigma, that describeq the intrinsic/observational scatter.
+    Fit full az/el pointing model using PyMC. The terms are analogous to those used by
+    TPOINT(tm). This fit includes the eight normal terms used and described in
+    `~pytelpoint.transform.azel` with additional terms, az_sigma and el_sigma, that
+    describe the intrinsic/observational scatter.
 
     Parameters
     ----------
@@ -71,14 +72,15 @@ def azel_fit(
         Dict of terms to fix to a specified value.
     init_pars : dict (default: None -> {'ia': 1200.})
         Initial guesses for the fit parameters. Keys are the same those provided by
-        `~pytelpoint.fitting.best_fit_pars` and described in `~pytelpoint.transform.azel`:
-        'ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx', 'az_sigma', 'el_sigma'.
-        The default for 'ia' is appropriate for the MMTO. If not specified, then the initial
-        guess for a parameter is assumed to be 0.
+        `~pytelpoint.fitting.best_fit_pars` and described in
+        `~pytelpoint.transform.azel`: 'ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx',
+        'az_sigma', 'el_sigma'. The default for 'ia' is appropriate for the MMTO.
+        If not specified, then the initial guess for a parameter is assumed to be 0.
     prior_sigmas : dict (default: None -> {'ia': 100., 'ie': 50.})
-        The priors for the fit parameters are assumed to be `~pymc.Normal` distributions. The sigmas
-        for these can be specified here. The index parameters, 'ia' and 'ie', have default sigma values
-        of 100 and 50, respectively. The rest default to 25 if not specified.
+        The priors for the fit parameters are assumed to be `~pymc.Normal`
+        distributions. The sigmas for these can be specified here. The index
+        parameters, 'ia' and 'ie', have default sigma values of 100 and
+        50, respectively. The rest default to 25 if not specified.
 
     Returns
     -------
@@ -95,8 +97,9 @@ def azel_fit(
     pointing_model = pm.Model()
 
     with pointing_model:
-        # az/el are the astrometric reference values. az_raw/el_raw are the observed encoder values.
-        # they should be in degrees, but are converted here just in case.
+        # az/el are the astrometric reference values. az_raw/el_raw are the observed
+        # encoder values. they should be in degrees, but are converted here
+        # just in case.
         az = pm.ConstantData('az', coo_ref.az.to(u.deg).value)
         el = pm.ConstantData('el', coo_ref.alt.to(u.deg).value)
         az_raw = pm.ConstantData('az_raw', coo_meas.az.to(u.deg).value)
@@ -111,7 +114,11 @@ def azel_fit(
             if term in fixed_terms:
                 terms[term] = fixed_terms[term]
             else:
-                terms[term] = pm.Normal(term, init_pars.get(term, 0.0), prior_sigmas.get(term, 25.))
+                terms[term] = pm.Normal(
+                    term,
+                    init_pars.get(term, 0.0),
+                    prior_sigmas.get(term, 25.)
+                )
 
         az_sigma = pm.HalfNormal('az_sigma', sigma=init_pars.get('az_sigma', 1.))
         el_sigma = pm.HalfNormal('el_sigma', sigma=init_pars.get('el_sigma', 1.))
@@ -127,7 +134,8 @@ def azel_fit(
             if k in combined_terms:
                 dalt += terms[k] * f(az, el)
 
-        # models are the raw encoder values plus pointing model; observed are the actual az/el
+        # models are the raw encoder values plus pointing model; observed are
+        # the actual az/el
         mu_az = az_raw + daz/3600.
         mu_el = el_raw + dalt/3600.
         _ = pm.Normal('azerr', mu=mu_az, sigma=az_sigma/3600, observed=az)
@@ -146,7 +154,8 @@ def azel_fit(
 
 def best_fit_pars(idata):
     """
-    Pull out the best fit parameters from a pointing model fit and return them as a dict.
+    Pull out the best fit parameters from a pointing model fit and
+    return them as a dict.
 
     Parameters
     ----------
