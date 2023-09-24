@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from matplotlib.testing.decorators import cleanup
-
 import astropy.units as u
 from astropy.coordinates import Angle, AltAz, SkyCoord
 from astropy.time import Time
@@ -25,25 +23,21 @@ COO_REF = SkyCoord(AZ_REF, EL_REF, frame=AA_FRAME)
 COO_MOD = azel_model(COO_REF, ia=1.)
 
 
-@cleanup
 def test_pointing_histogram():
     f = pointing_histogram(COO_REF, COO_MOD)
     assert (f is not None)
 
 
-@cleanup
 def test_azel_resid():
     f = pointing_azel_resid(COO_REF, COO_MOD)
     assert (f is not None)
 
 
-@cleanup
 def test_pointing_resid():
     f = pointing_residuals(COO_REF, COO_MOD)
     assert (f is not None)
 
 
-@cleanup
 def test_pointing_sky():
     f = pointing_sky(COO_REF, COO_MOD)
     assert (f is not None)
