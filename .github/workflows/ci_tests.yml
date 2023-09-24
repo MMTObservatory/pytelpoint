@@ -27,7 +27,7 @@ jobs:
             python: '3.11'
             toxenv: codestyle
 
-          - name: Python ${{ matrix.python }} with all optional dependencies and coverage checking
+          - name: Python 3.11 with all optional dependencies and coverage checking
             os: ubuntu-latest
             python: '3.11'
             toxenv: py311-test-alldeps-cov
