@@ -127,11 +127,15 @@ def read_raw_datfile(filename, obstime=Time.now()):
         for line in lines:
             if a_re.match(line):
                 line_data = line.split()
-                az_raw.append(180.0 - float(line_data[2]))
+                raw_az = Angle(float(line_data[2]), unit=u.degree)
+                corr_az = (180 * u.degree - raw_az).wrap_at(360 * u.degree)
+                az_raw.append(corr_az.value)
                 el_raw.append(float(line_data[1]))
             if t_re.match(line):
                 line_data = line.split()
-                az_obs.append(180.0 - float(line_data[2]))
+                raw_az = Angle(float(line_data[2]), unit=u.degree)
+                corr_az = (180 * u.degree - raw_az).wrap_at(360 * u.degree)
+                az_obs.append(corr_az.value)
                 el_obs.append(line_data[1])
 
         coo_obs, coo_raw = _mk_azel_coords(
