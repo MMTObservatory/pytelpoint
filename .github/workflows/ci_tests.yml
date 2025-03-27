@@ -33,9 +33,10 @@ jobs:
             toxenv: py311-test-cov
 
           - name: Python 3.13 with nightly wheels for key dependencies
+            continue-on-error: true
             os: ubuntu-latest
             python: '3.13'
-            toxenv: py311-test-devdeps
+            toxenv: py313-test-devdeps
 
     steps:
     - name: Checkout code
