@@ -30,7 +30,7 @@ jobs:
           - name: Python 3.13 with required dependencies and coverage checking
             os: ubuntu-latest
             python: '3.13'
-            toxenv: py311-test-cov
+            toxenv: py313-test-cov
 
           - name: Python 3.13 with nightly wheels for key dependencies
             continue-on-error: true
