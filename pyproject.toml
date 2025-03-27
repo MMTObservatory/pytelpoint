@@ -1,7 +1,118 @@
-[build-system]
+[project]
+name = "pytelpoint"
+dynamic = ["version"]
+authors = [
+    { name = "T. E. Pickering", email = "te.pickering@gmail.com"}
+]
+license = {file = "licenses/LICENSE.rst"}
+readme = "README.rst"
+description = "Python utilities for analyzing telescope pointing and tracking via probabilistic methods."
+requires-python = ">=3.13"
+dependencies = [
+    "astropy",
+    "scipy",
+    "matplotlib",
+    "arviz",
+    "corner",
+    "pymc",
+    "pandas",
+]
 
-requires = ["setuptools",
-            "setuptools_scm",
-            "wheel"]
+[project.optional-dependencies]
+test = [
+    "tox",
+    "coverage",
+    "pytest-astropy",
+    "black",
+    "flake8",
+    "coverage",
+    "pytest-benchmark",
+]
+docs = [
+    "sphinx-astropy",
+]
+extra = [
+    "ipympl",
+    "ipykernel",
+]
+
+[project.scripts]
+fix_mmtwfs_csvs = "pytelpoint.scripts.fix_csvs:main"
+fix_mmirs_exposure_time = "pytelpoint.scripts.fix_mmirs_exposure_time:main"
+rename_mmirs_files = "pytelpoint.scripts.rename_mmirs_files:main"
+reanalyze = "pytelpoint.scripts.reanalyze:main"
+
+[project.urls]
+Repository = "https://github.com/mmtobservatory/pytelpoint.git"
+Documentation = "https://pytelpoint.readthedocs.io/"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"pytelpoint.test_data" = ["**"]
+
+[tool.setuptools.packages]
+find = {}
+
+[tool.setuptools_scm]
+version_file = "pytelpoint/version.py"
+
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools_scm",
+]
 
 build-backend = 'setuptools.build_meta'
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = [
+    "pytelpoint/tests",
+    "docs",
+]
+astropy_header = false
+doctest_plus = "enabled"
+text_file_format = "rst"
+addopts = [
+    "--color=yes",
+    "--doctest-rst",
+]
+xfail_strict = false
+filterwarnings = [
+    "error",
+    "ignore:numpy\\.ufunc size changed:RuntimeWarning",
+    "ignore:numpy\\.ndarray size changed:RuntimeWarning",
+    # numpy 2 deprecation warnings from astropy.units
+    "ignore:.*__array__ implementation doesn't accept a copy keyword:DeprecationWarning",
+]
+
+[tool.coverage]
+
+    [tool.coverage.run]
+        omit = [
+            "pytelpoint/conftest.py",
+            "pytelpoint/tests/*",
+            "pytelpoint/version*",
+            "*/pytelpoint/conftest.py",
+            "*/pytelpoint/tests/*",
+            "*/pytelpoint/version*",
+        ]
+
+    [tool.coverage.report]
+        exclude_lines = [
+            # Have to re-enable the standard pragma
+            "pragma: no cover",
+            # Don't complain about packages we have installed
+            "except ImportError",
+            # Don't complain if tests don't hit defensive assertion code:
+            "raise AssertionError",
+            "raise NotImplementedError",
+            # Don't complain about script hooks
+            "'def main(.*):'",
+            # Ignore branches that don't pertain to this version of Python
+            "pragma: py{ignore_python_version}",
+            # Don't complain about IPython completion helper
+            "def _ipython_key_completions_",
+        ]

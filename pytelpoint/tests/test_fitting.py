@@ -1,18 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-import os
-import pkg_resources
+import importlib
 
 from pytelpoint.fitting import azel_fit, best_fit_pars
 from pytelpoint.visualization import plot_corner, plot_posterior
 from pytelpoint.io import read_azel_datfile
 
 
+TEST_DATA = importlib.resources.files("pytelpoint") / "test_data"
+
 def test_mc_fitting():
-    test_file = pkg_resources.resource_filename(
-        "pytelpoint",
-        os.path.join("test_data", "k_and_e.dat")
-    )
+    test_file = TEST_DATA / "k_and_e.dat"
+
     coo_ref, coo_meas = read_azel_datfile(test_file)
     idata = azel_fit(coo_ref, coo_meas, nsamp=200, ntune=200)
     assert (idata is not None)

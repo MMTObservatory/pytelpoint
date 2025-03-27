@@ -100,10 +100,10 @@ def azel_fit(
         # az/el are the astrometric reference values. az_raw/el_raw are the observed
         # encoder values. they should be in degrees, but are converted here
         # just in case.
-        az = pm.ConstantData('az', coo_ref.az.to(u.deg).value)
-        el = pm.ConstantData('el', coo_ref.alt.to(u.deg).value)
-        az_raw = pm.ConstantData('az_raw', coo_meas.az.to(u.deg).value)
-        el_raw = pm.ConstantData('el_raw', coo_meas.alt.to(u.deg).value)
+        az = pm.Data('az', coo_ref.az.to(u.deg).value)
+        el = pm.Data('el', coo_ref.alt.to(u.deg).value)
+        az_raw = pm.Data('az_raw', coo_meas.az.to(u.deg).value)
+        el_raw = pm.Data('el_raw', coo_meas.alt.to(u.deg).value)
 
         terms = {}
 
