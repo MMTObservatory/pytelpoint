@@ -9,7 +9,7 @@ from astropy.time import Time
 
 from pytelpoint.constants import MMT_LOCATION
 
-__all__ = ['read_azel_datfile', 'read_raw_datfile']
+__all__ = ["read_azel_datfile", "read_raw_datfile"]
 
 
 def _mk_azel_coords(az_ref, el_ref, az_meas, el_meas, obstime=Time.now()):
@@ -75,17 +75,13 @@ def read_azel_datfile(filename, data_start=20, obstime=Time.now()):
         t = ascii.read(
             filename,
             data_start=data_start,
-            format='no_header',
+            format="no_header",
             guess=False,
-            fast_reader=False
+            fast_reader=False,
         )
 
         coo_obs, coo_raw = _mk_azel_coords(
-            t['col1'],
-            t['col2'],
-            t['col3'],
-            t['col4'],
-            obstime=obstime
+            t["col1"], t["col2"], t["col3"], t["col4"], obstime=obstime
         )
 
         return coo_obs, coo_raw
@@ -115,7 +111,7 @@ def read_raw_datfile(filename, obstime=Time.now()):
     try:
         az_obs, el_obs, az_raw, el_raw = [], [], [], []
 
-        with open(filename, 'r') as fp:
+        with open(filename, "r") as fp:
             lines = fp.readlines()
 
         # flag for raw encoder position
@@ -139,11 +135,7 @@ def read_raw_datfile(filename, obstime=Time.now()):
                 el_obs.append(line_data[1])
 
         coo_obs, coo_raw = _mk_azel_coords(
-            az_obs,
-            el_obs,
-            az_raw,
-            el_raw,
-            obstime=obstime
+            az_obs, el_obs, az_raw, el_raw, obstime=obstime
         )
 
         return coo_obs, coo_raw

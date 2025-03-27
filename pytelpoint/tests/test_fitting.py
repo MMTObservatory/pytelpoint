@@ -9,18 +9,19 @@ from pytelpoint.io import read_azel_datfile
 
 TEST_DATA = importlib.resources.files("pytelpoint") / "test_data"
 
+
 def test_mc_fitting():
     test_file = TEST_DATA / "k_and_e.dat"
 
     coo_ref, coo_meas = read_azel_datfile(test_file)
     idata = azel_fit(coo_ref, coo_meas, nsamp=200, ntune=200)
-    assert (idata is not None)
+    assert idata is not None
 
     pfig = plot_posterior(idata)
-    assert (pfig is not None)
+    assert pfig is not None
 
     cfig = plot_corner(idata)
-    assert (cfig is not None)
+    assert cfig is not None
 
     tpars = best_fit_pars(idata)
-    assert (tpars is not None)
+    assert tpars is not None

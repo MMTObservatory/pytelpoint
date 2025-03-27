@@ -25,7 +25,7 @@ def skyrms(coo_ref, coo_meas):
         Root mean squared of the separation between coo_ref and coo_meas expressed in arcseconds.
     """
     sep = coo_ref.separation(coo_meas)
-    rms = np.sqrt((sep ** 2).mean()).to(u.arcsec)
+    rms = np.sqrt((sep**2).mean()).to(u.arcsec)
     return rms
 
 
