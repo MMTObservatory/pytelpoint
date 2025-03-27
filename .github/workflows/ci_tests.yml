@@ -24,13 +24,19 @@ jobs:
         include:
           - name: Code style checks
             os: ubuntu-latest
-            python: '3.11'
+            python: '3.13'
             toxenv: codestyle
 
-          - name: Python 3.11 with all optional dependencies and coverage checking
+          - name: Python 3.13 with required dependencies and coverage checking
             os: ubuntu-latest
-            python: '3.11'
-            toxenv: py311-test-alldeps-cov
+            python: '3.13'
+            toxenv: py313-test-cov
+
+          - name: Python 3.13 with nightly wheels for key dependencies
+            continue-on-error: true
+            os: ubuntu-latest
+            python: '3.13'
+            toxenv: py313-test-devdeps
 
     steps:
     - name: Checkout code

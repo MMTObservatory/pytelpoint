@@ -7,41 +7,41 @@ import pymc as pm
 
 import astropy.units as u
 
-__all__ = ['azel_fit', 'best_fit_pars']
+__all__ = ["azel_fit", "best_fit_pars"]
 
 DEG2RAD = np.pi / 180
-AZEL_TERMS = ('ia', 'ie', 'an', 'aw', 'ca', 'npae', 'tf', 'tx')
-HADEC_TERMS = ('ih', 'id', 'np', 'ch', 'ma', 'me', 'tf')
+AZEL_TERMS = ("ia", "ie", "an", "aw", "ca", "npae", "tf", "tx")
+HADEC_TERMS = ("ih", "id", "np", "ch", "ma", "me", "tf")
 
 AZIMUTH_FUNCS = {
-    'ia': lambda az, el: -1.0,
-    'an': lambda az, el: -1.0 * pm.math.sin(DEG2RAD * az) * pm.math.tan(DEG2RAD * el),
-    'aw': lambda az, el: -1.0 * pm.math.cos(DEG2RAD * az) * pm.math.tan(DEG2RAD * el),
-    'ca': lambda az, el: -1.0 / pm.math.cos(DEG2RAD * el),
-    'npae': lambda az, el: -1.0 * pm.math.tan(DEG2RAD * el)
+    "ia": lambda az, el: -1.0,
+    "an": lambda az, el: -1.0 * pm.math.sin(DEG2RAD * az) * pm.math.tan(DEG2RAD * el),
+    "aw": lambda az, el: -1.0 * pm.math.cos(DEG2RAD * az) * pm.math.tan(DEG2RAD * el),
+    "ca": lambda az, el: -1.0 / pm.math.cos(DEG2RAD * el),
+    "npae": lambda az, el: -1.0 * pm.math.tan(DEG2RAD * el),
 }
 
 ELEVATION_FUNCS = {
-    'ie': lambda az, el: 1.0,
-    'an': lambda az, el: -1.0 * pm.math.cos(DEG2RAD * az),
-    'aw': lambda az, el: pm.math.sin(DEG2RAD * az),
-    'tf': lambda az, el: -1.0 * pm.math.cos(DEG2RAD * el),
-    'tx': lambda az, el: -1.0 / pm.math.tan(DEG2RAD * el)
+    "ie": lambda az, el: 1.0,
+    "an": lambda az, el: -1.0 * pm.math.cos(DEG2RAD * az),
+    "aw": lambda az, el: pm.math.sin(DEG2RAD * az),
+    "tf": lambda az, el: -1.0 * pm.math.cos(DEG2RAD * el),
+    "tx": lambda az, el: -1.0 / pm.math.tan(DEG2RAD * el),
 }
 
 
 def azel_fit(
-        coo_ref,
-        coo_meas,
-        nsamp=2000,
-        ntune=500,
-        target_accept=0.95,
-        random_seed=8675309,
-        cores=None,
-        fit_terms=AZEL_TERMS,
-        fixed_terms=None,
-        init_pars=None,
-        prior_sigmas=None
+    coo_ref,
+    coo_meas,
+    nsamp=2000,
+    ntune=500,
+    target_accept=0.95,
+    random_seed=8675309,
+    cores=None,
+    fit_terms=AZEL_TERMS,
+    fixed_terms=None,
+    init_pars=None,
+    prior_sigmas=None,
 ):
     """
     Fit full az/el pointing model using PyMC. The terms are analogous to those used by
@@ -90,9 +90,9 @@ def azel_fit(
     if fixed_terms is None:
         fixed_terms = {}
     if init_pars is None:
-        init_pars = {'ia': 1200.}
+        init_pars = {"ia": 1200.0}
     if prior_sigmas is None:
-        prior_sigmas = {'ia': 100., 'ie': 50.}
+        prior_sigmas = {"ia": 100.0, "ie": 50.0}
 
     pointing_model = pm.Model()
 
@@ -100,10 +100,10 @@ def azel_fit(
         # az/el are the astrometric reference values. az_raw/el_raw are the observed
         # encoder values. they should be in degrees, but are converted here
         # just in case.
-        az = pm.ConstantData('az', coo_ref.az.to(u.deg).value)
-        el = pm.ConstantData('el', coo_ref.alt.to(u.deg).value)
-        az_raw = pm.ConstantData('az_raw', coo_meas.az.to(u.deg).value)
-        el_raw = pm.ConstantData('el_raw', coo_meas.alt.to(u.deg).value)
+        az = pm.Data("az", coo_ref.az.to(u.deg).value)
+        el = pm.Data("el", coo_ref.alt.to(u.deg).value)
+        az_raw = pm.Data("az_raw", coo_meas.az.to(u.deg).value)
+        el_raw = pm.Data("el_raw", coo_meas.alt.to(u.deg).value)
 
         terms = {}
 
@@ -115,13 +115,11 @@ def azel_fit(
                 terms[term] = fixed_terms[term]
             else:
                 terms[term] = pm.Normal(
-                    term,
-                    init_pars.get(term, 0.0),
-                    prior_sigmas.get(term, 25.)
+                    term, init_pars.get(term, 0.0), prior_sigmas.get(term, 25.0)
                 )
 
-        az_sigma = pm.HalfNormal('az_sigma', sigma=init_pars.get('az_sigma', 1.))
-        el_sigma = pm.HalfNormal('el_sigma', sigma=init_pars.get('el_sigma', 1.))
+        az_sigma = pm.HalfNormal("az_sigma", sigma=init_pars.get("az_sigma", 1.0))
+        el_sigma = pm.HalfNormal("el_sigma", sigma=init_pars.get("el_sigma", 1.0))
 
         daz = 0.0
         for k, f in AZIMUTH_FUNCS.items():
@@ -136,10 +134,10 @@ def azel_fit(
 
         # models are the raw encoder values plus pointing model; observed are
         # the actual az/el
-        mu_az = az_raw + daz/3600.
-        mu_el = el_raw + dalt/3600.
-        _ = pm.Normal('azerr', mu=mu_az, sigma=az_sigma/3600, observed=az)
-        _ = pm.Normal('elerr', mu=mu_el, sigma=el_sigma/3600, observed=el)
+        mu_az = az_raw + daz / 3600.0
+        mu_el = el_raw + dalt / 3600.0
+        _ = pm.Normal("azerr", mu=mu_az, sigma=az_sigma / 3600, observed=az)
+        _ = pm.Normal("elerr", mu=mu_el, sigma=el_sigma / 3600, observed=el)
 
         idata = pm.sample(
             nsamp,
@@ -147,7 +145,7 @@ def azel_fit(
             target_accept=target_accept,
             return_inferencedata=True,
             random_seed=random_seed,
-            cores=cores
+            cores=cores,
         )
     return idata
 
@@ -170,6 +168,6 @@ def best_fit_pars(idata):
     t_fit = arviz.summary(idata, round_to=8)
     pointing_pars = {}
     for p in t_fit.index:
-        pointing_pars[p] = t_fit.loc[p, 'mean']
+        pointing_pars[p] = t_fit.loc[p, "mean"]
 
     return pointing_pars
