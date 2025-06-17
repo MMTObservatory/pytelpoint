@@ -1,0 +1,24 @@
+name: pytelpoint
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.13
+  - astropy
+  - scipy
+  - matplotlib
+  - numpy
+  - pandas
+  - arviz
+  - corner
+  - pymc
+  - pip
+  - ipympl
+  - ipykernel
+  - tox
+  - tox-conda
+  - coverage
+  - pytest-astropy
+  - black
+  - flake8
+  - pytest-benchmark
+  - sphinx-astropy
