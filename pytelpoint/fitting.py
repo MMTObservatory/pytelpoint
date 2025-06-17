@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+import platform
 
 import numpy as np
 
@@ -6,6 +7,13 @@ import arviz
 import pymc as pm
 
 import astropy.units as u
+
+
+# conda-forge adds their own clang++ to pymc dependencies, but it conflicts with
+# the xcode command-line tools libraries. enforce the use of apple's clang++.
+if platform.system() == "Darwin":
+    import pytensor
+    pytensor.config.cxx = "/usr/bin/clang++"
 
 __all__ = ["azel_fit", "best_fit_pars"]
 

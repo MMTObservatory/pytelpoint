@@ -28,13 +28,13 @@ jobs:
             toxenv: codestyle
 
           - name: Python 3.13 with required dependencies and coverage checking
-            os: ubuntu-latest
+            os: macos-latest
             python: '3.13'
             toxenv: py313-test-cov
 
           - name: Python 3.13 with nightly wheels for key dependencies
             continue-on-error: true
-            os: ubuntu-latest
+            os: macos-latest
             python: '3.13'
             toxenv: py313-test-devdeps
 

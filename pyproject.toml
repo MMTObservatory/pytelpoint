@@ -4,7 +4,7 @@ dynamic = ["version"]
 authors = [
     { name = "T. E. Pickering", email = "te.pickering@gmail.com"}
 ]
-license = {file = "licenses/LICENSE.rst"}
+license-files = ["licenses/LICENSE.rst"]
 readme = "README.rst"
 description = "Python utilities for analyzing telescope pointing and tracking via probabilistic methods."
 requires-python = ">=3.13"
