@@ -14,11 +14,12 @@ dependencies:
   - pip
   - ipympl
   - ipykernel
-  - tox
-  - tox-conda
   - coverage
   - pytest-astropy
   - black
   - flake8
   - pytest-benchmark
   - sphinx-astropy
+  - pip:
+    - tox
+    - tox-conda
