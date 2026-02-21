@@ -46,8 +46,8 @@ All core modules use `SkyCoord` (AstropY) as the primary data carrier. The typic
 1. **IO** (`io.py`): Read pointing run data → returns `(coo_ref, coo_meas)` pair of `SkyCoord` objects in an `AltAz` frame tied to `MMT_LOCATION`.
 2. **Stats** (`stats.py`): Compute sky RMS / population SD from coordinate pairs (TPOINT-equivalent diagnostics).
 3. **Transform** (`transform.py`): Apply an 8-term az/el pointing model (`azel_model`) analytically to raw encoder coordinates.
-4. **Fitting** (`fitting.py`): Fit the pointing model probabilistically using PyMC (`azel_fit`), returning an `arviz.InferenceData` object. `best_fit_pars` summarizes the posterior.
-5. **Visualization** (`visualization.py`): `plot_posterior` and `plot_corner` for inspecting PyMC fit results.
+4. **Fitting** (`fitting.py`): Fit the pointing model probabilistically using PyMC (`azel_fit`), returning an `arviz.InferenceData` object. `best_fit_pars` summarizes the posterior using `arviz_stats.summary`.
+5. **Visualization** (`visualization.py`): `plot_posterior` and `plot_corner` for inspecting PyMC fit results using `arviz_plots`.
 
 ### Pointing model terms (TPOINT-compatible)
 
