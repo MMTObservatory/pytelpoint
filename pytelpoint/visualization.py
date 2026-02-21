@@ -6,7 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 import corner
-import arviz
+import arviz_plots
 
 import astropy.units as u
 from astropy.visualization import hist
@@ -332,8 +332,8 @@ def plot_posterior(idata):
 
     Returns
     -------
-    fig : `matplotlib.figure.Figure` instance
-        Figure object containing the corner plot.
+    pc : `~arviz_plots.PlotCollection`
+        PlotCollection containing the posterior distribution plots.
     """
-    fig = arviz.plot_posterior(idata)
-    return fig
+    pc = arviz_plots.plot_dist(idata)
+    return pc
