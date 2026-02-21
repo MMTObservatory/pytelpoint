@@ -3,7 +3,7 @@ import platform
 
 import numpy as np
 
-import arviz
+import arviz_stats
 import pymc as pm
 
 import astropy.units as u
@@ -173,7 +173,7 @@ def best_fit_pars(idata):
     pointing_pars : dict
         Best-fit pointing parameters
     """
-    t_fit = arviz.summary(idata, round_to=8)
+    t_fit = arviz_stats.summary(idata, round_to=8)
     pointing_pars = {}
     for p in t_fit.index:
         pointing_pars[p] = t_fit.loc[p, "mean"]
