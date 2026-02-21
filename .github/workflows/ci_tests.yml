@@ -37,9 +37,15 @@ jobs:
             python: '3.13'
             toxenv: py313-test
 
-          - name: Python 3.14 with nightly wheels for key dependencies
+          - name: Python 3.14 with nightly wheels for key dependencies (macOS)
             continue-on-error: true
             os: macos-latest
+            python: '3.14'
+            toxenv: py314-test-devdeps
+
+          - name: Python 3.14 with nightly wheels for key dependencies (Linux)
+            continue-on-error: true
+            os: ubuntu-latest
             python: '3.14'
             toxenv: py314-test-devdeps
 
